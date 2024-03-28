@@ -25,6 +25,7 @@ add_compile_definitions(HSE_VALUE=8000000)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/bsp
+    ${PROJECT_SOURCE_DIR}/app
     ${PROJECT_SOURCE_DIR}/lib
     ${PROJECT_SOURCE_DIR}/lib/CMSIS
     ${PROJECT_SOURCE_DIR}/lib/STM32F4xx
@@ -34,6 +35,7 @@ include_directories(
 file(GLOB_RECURSE SOURCES
         "main.c"
         "bsp/bsp.c"
+        "app/app.c"
         "system_stm32f4xx.c"
         "startup_stm32f4xx.S"
         "lib/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.c"

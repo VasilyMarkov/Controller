@@ -40,6 +40,7 @@ file(GLOB_RECURSE SOURCES
         "startup_stm32f4xx.S"
         "lib/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.c"
         "lib/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.c"
+        "lib/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_usart.c"
     )
 
 set(LINKER_SCRIPT ${PROJECT_SOURCE_DIR}/stm32_flash.ld)

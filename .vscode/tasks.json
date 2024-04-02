@@ -4,7 +4,7 @@
 		{
 			"label": "build",
 			"type": "shell",
-			"command": "cmake", 
+			"command": "cmake",
 			"args": [
 				"--build",
 				"${workspaceFolder}/build"
@@ -23,10 +23,10 @@
 		{
 			"label": "generate",
 			"type": "shell",
-			"command": "cmake", 
+			"command": "cmake",
 			"args": [
 				"-S",
-				".", 
+				".",
 				"-B",
 				"build"
 			],
@@ -39,48 +39,85 @@
 			}
 		},
 		{
-            "label": "clean",
-            "type": "shell",
-            "command": "rm",
-            "args": [
-                "-rf",
-                "${workspaceFolder}/build"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        },
+			"label": "clean",
+			"type": "shell",
+			"command": "rm",
+			"args": [
+				"-rf",
+				"${workspaceFolder}/build"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
 		{
-            "label": "flash",
-            "type": "shell",
-            "command": "openocd",
-            "args": [
-                "-f",
-                "interface/stlink-v2.cfg",
+			"label": "flash",
+			"type": "shell",
+			"command": "openocd",
+			"args": [
+				"-f",
+				"interface/stlink-v2.cfg",
 				"-f",
 				"target/stm32f4x.cfg",
-                "-c",
-                "init",
-                "-c",
-                "reset halt",
-                "-c",
-                "flash write_image erase ${workspaceFolder}/build/stm32.elf",
-                "-c",
-                "reset",
-                "-c",
-                "exit"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": [
-                "$gcc"
-            ]
-        }
+				"-c",
+				"init",
+				"-c",
+				"reset halt",
+				"-c",
+				"flash write_image erase ${workspaceFolder}/build/stm32.hex",
+				"-c",
+				"reset",
+				"-c",
+				"exit"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [
+				"$gcc"
+			]
+		},
+		{
+			"label": "run OpenOCD",
+			"type": "shell",
+			"command": "openocd",
+			"args": [
+				"-f",
+				"interface/stlink-v2.cfg",
+				"-f",
+				"target/stm32f4x.cfg"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"isBackground": true
+		},
+		{
+			"label": "gdb",
+			"type": "shell",
+			"command": "gdb",
+			"args": [
+				"${workspaceFolder}/build/stm32.elf",
+				"-ex",
+				"target remote :3333"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [],
+			"dependsOn": [
+				"run OpenOCD"
+			]
+		},
 	]
 }

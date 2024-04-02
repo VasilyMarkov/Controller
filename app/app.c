@@ -1,29 +1,32 @@
 #include "app.h"
 
-const uint16_t leds = GPIO_Pin_0 | GPIO_Pin_7 | GPIO_Pin_14;
-const uint16_t leds_arr[4] = {GPIO_Pin_0, GPIO_Pin_7, GPIO_Pin_14};
+
 
 void delay(uint32_t ms) {
-    ms *= 3360;
+    ms *= 16800;
     while(ms--) {
         __NOP();
     }
 }
 
 void loop() {
-    static uint32_t counter = 0;
-
-    ++counter;
-
-    GPIO_ResetBits(GPIOB, leds);
-    GPIO_SetBits(GPIOB, leds_arr[counter % 3]);
-
-    delay(250);
+    GPIO_ToggleBits(GPIOB, GPIO_Pin_7);
+    
+    delay(500);
 }
 
 void app() {
-    
+    volatile uint8_t sendData[8];
+    volatile uint8_t bytesToSend = 8;
+    // Счетчик отправленных байт
+    volatile uint8_t sendDataCounter = 0;
+    for (uint8_t i = 0; i < 8; i++)
+    {
+        sendData[i] = i;
+    }
+    // USART_ITConfig(USART2, USART_IT_TC, ENABLE);
     while(1) {
+        USART_SendData(USART2, sendData[sendDataCounter++ % 8]);
         loop();
     };
 }

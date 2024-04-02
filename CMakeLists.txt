@@ -21,7 +21,7 @@ add_compile_options(-mcpu=${MCPU} -mthumb -mthumb-interwork)
 add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0)
 
 add_definitions(-DSTM32F439xx)
-add_compile_definitions(HSE_VALUE=8000000)
+add_definitions(-DHSE_VALUE=8000000)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/bsp
@@ -46,6 +46,8 @@ file(GLOB_RECURSE SOURCES
 set(LINKER_SCRIPT ${PROJECT_SOURCE_DIR}/stm32_flash.ld)
 
 add_link_options(-specs=nosys.specs)
+add_link_options(-specs=nano.specs)
+add_link_options(-u _printf_float)
 add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
 add_link_options(-mcpu=${MCPU} -mthumb -mthumb-interwork)
 add_link_options(-T ${LINKER_SCRIPT})

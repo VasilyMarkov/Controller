@@ -10,6 +10,36 @@
 /* USB OTG FS, SDIO and RNG Clock =  PLL_VCO / PLLQ */
 #define PLL_Q      7
 
+// #ifdef __GNUC__
+// #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+// #else
+// #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+// #endif /* __GNUC__ */
+
+// PUTCHAR_PROTOTYPE
+// {
+//     for(uint8_t i = 0; i < len; ++i) {
+//         USART_SendData(USART2, ptr[i]);
+//     }
+//   return ch;
+// }
+
+int _write(int fd, char* ptr, int len) {
+    int i= 0;
+    while(i < len) {
+        while (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET); // Ждем, пока буфер передатчика не освободится
+        USART_SendData(USART2, *ptr++); // Отправляем символ
+        i++;
+    }
+    
+    return len;
+}
+
+void UART_SendString(const char* str) {
+  while (*str) {
+
+  }
+}
 
 
 

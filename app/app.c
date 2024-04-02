@@ -16,17 +16,8 @@ void loop() {
 }
 
 void app() {
-    volatile uint8_t sendData[8];
-    volatile uint8_t bytesToSend = 8;
-    // Счетчик отправленных байт
-    volatile uint8_t sendDataCounter = 0;
-    for (uint8_t i = 0; i < 8; i++)
-    {
-        sendData[i] = i;
-    }
-    // USART_ITConfig(USART2, USART_IT_TC, ENABLE);
     while(1) {
-        USART_SendData(USART2, sendData[sendDataCounter++ % 8]);
+        printf("Hello, world%.6f\r\n", 5.432);
         loop();
     };
 }

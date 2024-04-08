@@ -5,7 +5,8 @@
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
 #include "stm32f4xx_usart.h"
-#include <stdio.h> 
+#include "stm32f4x7_eth.h"
+// #include "stm32f4x7_eth_bsp.h"
 
 void board_init();
 

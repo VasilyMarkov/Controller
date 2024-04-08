@@ -68,7 +68,7 @@
 				"-c",
 				"reset halt",
 				"-c",
-				"flash write_image erase ${workspaceFolder}/build/stm32.hex",
+				"flash write_image erase ${workspaceFolder}/build/bin/stm32.hex",
 				"-c",
 				"reset",
 				"-c",

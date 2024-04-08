@@ -1,51 +1,19 @@
 #include "bsp.h"
-
-
-#define PLL_M      4
-#define PLL_N      168
-
-/* SYSCLK = PLL_VCO / PLL_P */
-#define PLL_P      2
-
-/* USB OTG FS, SDIO and RNG Clock =  PLL_VCO / PLLQ */
-#define PLL_Q      7
-
-// #ifdef __GNUC__
-// #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-// #else
-// #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-// #endif /* __GNUC__ */
-
-// PUTCHAR_PROTOTYPE
-// {
-//     for(uint8_t i = 0; i < len; ++i) {
-//         USART_SendData(USART2, ptr[i]);
+#include <stdio.h> 
+// int _write(int fd, char* ptr, int len) {
+//     int i= 0;
+//     while(i < len) {
+//         while (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET); 
+//         USART_SendData(USART2, *ptr++);
+//         i++;
 //     }
-//   return ch;
-// }
-
-int _write(int fd, char* ptr, int len) {
-    int i= 0;
-    while(i < len) {
-        while (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET); // Ждем, пока буфер передатчика не освободится
-        USART_SendData(USART2, *ptr++); // Отправляем символ
-        i++;
-    }
     
-    return len;
-}
-
-void UART_SendString(const char* str) {
-  while (*str) {
-
-  }
-}
-
-
+//     return len;
+// }
 
 void SysTick_Handler(void)
 {
-    //GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
+    GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
 }   
 
 void USART2_IRQHandler()
@@ -54,26 +22,10 @@ void USART2_IRQHandler()
 }  
 
 void sysTick_init(void) {
-    uint32_t tick = SystemCoreClock/2 - 1;
+    uint32_t tick = 10000000;
     SysTick->LOAD = tick; 
-    SysTick->VAL = tick; 
+    SysTick->VAL = 0; 
     SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
-}
-
-void systemClock_init(void) {
-    RCC_DeInit(); // Reset RCC configuration to default values
-
-    RCC_HSEConfig(RCC_HSE_ON); // Enable HSE (High Speed External) clock
-    if (RCC_WaitForHSEStartUp() == SUCCESS) { // Wait for HSE clock to stabilize
-        RCC_PLLConfig(RCC_PLLSource_HSE, PLL_M, PLL_N, PLL_P, PLL_Q); // Configure PLL
-        RCC_PLLCmd(ENABLE); // Enable PLL
-        while (RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET); // Wait for PLL to stabilize
-
-        
-        FLASH->ACR = FLASH_ACR_ICEN |FLASH_ACR_DCEN |FLASH_ACR_LATENCY_5WS;
-        RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK); // Set PLL as system clock
-        while (RCC_GetSYSCLKSource() != RCC_CFGR_SWS_PLL); // Wait for PLL to become system clock
-    }
 }
 
 void gpio_init() {
@@ -84,7 +36,6 @@ void gpio_init() {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
     
-
     GPIO_InitTypeDef gpio;
 
     GPIO_StructInit(&gpio);
@@ -114,14 +65,24 @@ void usart_init() {
     //NVIC_EnableIRQ(USART2_IRQn);
 }
 
-void board_init() {
+void ethernet_init() {
+    ETH_InitTypeDef ETH_InitStructure;
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_ETH_MAC | RCC_AHB1Periph_ETH_MAC_Tx | RCC_AHB1Periph_ETH_MAC_Rx, ENABLE);
+}
 
-    SystemInit();
-    //systemClock_init();
-    sysTick_init();
-    //__enable_irq(); 
+void board_init() {
+    // uint32_t tick = 16777216;
+    uint32_t tick = 0x1000000;
+    
+    SysTick_Config(tick);
+    
+    NVIC_EnableIRQ(SysTick_IRQn);
+    __enable_irq(); 
     gpio_init();
     usart_init();
+    // ETH_BSP_Config();
+    printf("Controller is started...\n");
+    // printf("clk: %.d\r\n", tick);
 
 }
 

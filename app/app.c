@@ -17,7 +17,11 @@ void loop() {
 
 void app() {
     while(1) {
-        printf("Hello, world%.6f\r\n", 5.432);
+        // printf("Hello, world%.2f\r\n", 2.71);
+        RCC_ClocksTypeDef clk;
+        RCC_GetClocksFreq(&clk);
+        printf("LOAD: %.d\r\n", SysTick->LOAD);
+        printf("VAL: %.d\r\n", SysTick->VAL);
         loop();
     };
 }

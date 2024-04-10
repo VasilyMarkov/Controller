@@ -5,8 +5,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 project(stm32)
 
-add_subdirectory(bsp)
-add_subdirectory(lib)
+add_subdirectory(bsp)   #application
+add_subdirectory(lib)   #stm32f4xx library
+add_subdirectory(lwip)  #lwip library
 
 
 

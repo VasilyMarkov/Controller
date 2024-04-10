@@ -4,6 +4,10 @@ project(${target_base_name})
 
 set(elf_file ${target_base_name}.elf)
 
+set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/lwip)
+
+find_package(LwIP REQUIRED)
+
 add_executable(${elf_file}    
     ${CMAKE_SOURCE_DIR}/app/app.c 
     bsp.c
@@ -14,6 +18,7 @@ add_executable(${elf_file}
 target_include_directories(${elf_file} PRIVATE 
     ${CMAKE_SOURCE_DIR}/app
     ${CMAKE_SOURCE_DIR}/bsp
+    # ${CMAKE_SOURCE_DIR}/lwip/src/include/lwip 
 )
 
 target_compile_options(${elf_file} PRIVATE -Wall -Wextra -Os)

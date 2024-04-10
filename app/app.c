@@ -1,7 +1,5 @@
 #include "app.h"
 
-
-
 void delay(uint32_t ms) {
     ms *= 16800;
     while(ms--) {
@@ -20,8 +18,8 @@ void app() {
         // printf("Hello, world%.2f\r\n", 2.71);
         RCC_ClocksTypeDef clk;
         RCC_GetClocksFreq(&clk);
-        printf("LOAD: %.d\r\n", SysTick->LOAD);
-        printf("VAL: %.d\r\n", SysTick->VAL);
+        printf("Status: %.d\r\n", getRegister());
+        // printf("VAL: %.d\r\n", SysTick->VAL);
         loop();
     };
 }

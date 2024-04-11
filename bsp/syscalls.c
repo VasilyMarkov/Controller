@@ -60,7 +60,7 @@ int _getpid(void)
 
 int _kill(int pid, int sig)
 {
-	errno = EINVAL;
+	// errno = EINVAL;
 	return -1;
 }
 
@@ -79,7 +79,7 @@ int _read (int file, char *ptr, int len)
 	  *ptr++ = __io_getchar();
 	}
 
-return len;
+	return len;
 }
 
 int _write(int file, char *ptr, int len)
@@ -108,7 +108,7 @@ caddr_t _sbrk(int incr)
 	{
 //		write(1, "Heap and stack collision\n", 25);
 //		abort();
-		errno = ENOMEM;
+		// errno = ENOMEM;
 		return (caddr_t) -1;
 	}
 
@@ -147,13 +147,13 @@ int _open(char *path, int flags, ...)
 
 int _wait(int *status)
 {
-	errno = ECHILD;
+	// errno = ECHILD;
 	return -1;
 }
 
 int _unlink(char *name)
 {
-	errno = ENOENT;
+	// errno = ENOENT;
 	return -1;
 }
 
@@ -170,18 +170,18 @@ int _stat(char *file, struct stat *st)
 
 int _link(char *old, char *new)
 {
-	errno = EMLINK;
+	// errno = EMLINK;
 	return -1;
 }
 
 int _fork(void)
 {
-	errno = EAGAIN;
+	// errno = EAGAIN;
 	return -1;
 }
 
 int _execve(char *name, char **argv, char **env)
 {
-	errno = ENOMEM;
+	// errno = ENOMEM;
 	return -1;
 }

@@ -1,6 +1,6 @@
 #include <stdio.h> 
 #include "bsp.h"
- 
+
 static uint32_t EthStatus = 0;
 
 void SysTick_Handler(void)
@@ -94,37 +94,36 @@ void usart_init() {
 const uint8_t MAC_ADDR[6] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55};
 const uint8_t PHY_ADDR = 0x00;
 
+#define IP_ADDR0 192
+#define IP_ADDR1 168
+#define IP_ADDR2 0
+#define IP_ADDR3 5
+
+#define NETMASK_ADDR0 255
+#define NETMASK_ADDR1 255
+#define NETMASK_ADDR2 255
+#define NETMASK_ADDR3 0
+
+#define GW_ADDR0 192
+#define GW_ADDR1 168
+#define GW_ADDR2 0
+#define GW_ADDR3 1
+
+// static struct udp_pcb *echo_pcb;
+// static char echo_buffer[128];
+// static ip_addr_t ipaddr, netmask, gw;
+// static struct netif gnetif;
 void eth_init() {
-    ETH_InitTypeDef ETH_InitStructure;
+    // lwip_init();
     
-    ETH_DeInit();
-    ETH_SoftwareReset();
-    printf("Eth reseting...\r\n");
-    while (ETH_GetSoftwareResetStatus() == SET);
-    printf("Done\r\n");
 
-    ETH_MACAddressConfig(ETH_MAC_Address0, MAC_ADDR);
+    // IP4_ADDR(&ipaddr, IP_ADDR0, IP_ADDR1, IP_ADDR2, IP_ADDR3);
+    // IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1, NETMASK_ADDR2, NETMASK_ADDR3);
+    // IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
 
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_ETH_MAC | RCC_AHB1Periph_ETH_MAC_Tx | RCC_AHB1Periph_ETH_MAC_Rx, ENABLE);
-    ETH_StructInit(&ETH_InitStructure);
-    ETH_InitStructure.ETH_AutoNegotiation = ETH_AutoNegotiation_Enable;
-    ETH_InitStructure.ETH_Speed = ETH_Speed_100M;
-    ETH_InitStructure.ETH_Mode = ETH_Mode_FullDuplex;   
-    ETH_InitStructure.ETH_LoopbackMode = ETH_LoopbackMode_Disable;
-    ETH_InitStructure.ETH_RetryTransmission = ETH_RetryTransmission_Disable;
-    ETH_InitStructure.ETH_AutomaticPadCRCStrip = ETH_AutomaticPadCRCStrip_Disable;
-    ETH_InitStructure.ETH_ReceiveAll = ETH_ReceiveAll_Enable;
-
-    ETH_InitStructure.ETH_BroadcastFramesReception = ETH_BroadcastFramesReception_Enable;
-    ETH_InitStructure.ETH_PromiscuousMode = ETH_PromiscuousMode_Disable;
-    ETH_InitStructure.ETH_MulticastFramesFilter = ETH_MulticastFramesFilter_Perfect;
-    ETH_InitStructure.ETH_UnicastFramesFilter = ETH_UnicastFramesFilter_Perfect;
-
-    
-    EthStatus = ETH_Init(&ETH_InitStructure, PHY_ADDR);
-    printf("Eth init with status: %d\r\n", EthStatus);
-
-    ETH_Start();
+    // netif_set_ipaddr(&gnetif, &ipaddr);
+    // netif_set_netmask(&gnetif, &netmask);
+    // netif_set_gw(&gnetif, &gw);
 }
 
 void board_init() {

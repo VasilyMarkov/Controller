@@ -7,7 +7,7 @@ project(stm32)
 
 add_subdirectory(bsp)   #application
 add_subdirectory(lib)   #stm32f4xx library
-add_subdirectory(lwip)  #lwip library
+# add_subdirectory(lwip)  #lwip library
 
 
 

@@ -8,9 +8,9 @@ void delay(uint32_t ms) {
 }
 
 void loop() {
-    GPIO_ToggleBits(GPIOB, GPIO_Pin_7);
+    // GPIO_ToggleBits(GPIOB, GPIO_Pin_7);
     
-    delay(500);
+    // delay(500);
 }
 
 void app() {

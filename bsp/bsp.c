@@ -1,5 +1,6 @@
 #include <stdio.h> 
 #include "bsp.h"
+#include "stm32f4x7_eth.h"
 
 static uint32_t EthStatus = 0;
 
@@ -109,21 +110,44 @@ const uint8_t PHY_ADDR = 0x00;
 #define GW_ADDR2 0
 #define GW_ADDR3 1
 
-// static struct udp_pcb *echo_pcb;
-// static char echo_buffer[128];
-// static ip_addr_t ipaddr, netmask, gw;
-// static struct netif gnetif;
+static ETH_InitTypeDef ETH_InitStructure;
+static ETH_DMADESCTypeDef  DMARxDscrTab[ETH_RXBUFNB], DMATxDscrTab[ETH_TXBUFNB];
+static u8 Rx_Buff[ETH_RXBUFNB][ETH_MAX_PACKET_SIZE], Tx_Buff[ETH_TXBUFNB][ETH_MAX_PACKET_SIZE]; 
+
 void eth_init() {
-    // lwip_init();
-    
+    ETH_DeInit();
+    ETH_SoftwareReset();
+    while(ETH_GetSoftwareResetStatus()==SET);
 
-    // IP4_ADDR(&ipaddr, IP_ADDR0, IP_ADDR1, IP_ADDR2, IP_ADDR3);
-    // IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1, NETMASK_ADDR2, NETMASK_ADDR3);
-    // IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
+    ETH_StructInit(&ETH_InitStructure);
+    /*------------------------   MAC   -----------------------------------*/
+    ETH_InitStructure.ETH_AutoNegotiation = ETH_AutoNegotiation_Enable ; 
+    ETH_InitStructure.ETH_Speed = ETH_Speed_100M;                                     
+    ETH_InitStructure.ETH_LoopbackMode = ETH_LoopbackMode_Disable;
+    ETH_InitStructure.ETH_Mode = ETH_Mode_FullDuplex;
+    ETH_InitStructure.ETH_RetryTransmission = ETH_RetryTransmission_Disable;
+    ETH_InitStructure.ETH_AutomaticPadCRCStrip = ETH_AutomaticPadCRCStrip_Disable; 
+    ETH_InitStructure.ETH_ReceiveAll = ETH_ReceiveAll_Enable;
+    ETH_InitStructure.ETH_BroadcastFramesReception = ETH_BroadcastFramesReception_Disable;     
+    ETH_InitStructure.ETH_PromiscuousMode = ETH_PromiscuousMode_Disable;
+    ETH_InitStructure.ETH_MulticastFramesFilter = ETH_MulticastFramesFilter_Perfect;
+    ETH_InitStructure.ETH_UnicastFramesFilter = ETH_UnicastFramesFilter_Perfect;
+    /* Configure ETHERNET */
+    uint32_t value = ETH_Init(&ETH_InitStructure, 0);
+    /* Initialize Tx Descriptors list: Chain Mode */
+    ETH_DMATxDescChainInit(DMATxDscrTab, &Tx_Buff[0][0], ETH_TXBUFNB);
+    /* Initialize Rx Descriptors list: Chain Mode  */
+    ETH_DMARxDescChainInit(DMARxDscrTab, &Rx_Buff[0][0], ETH_RXBUFNB);
 
-    // netif_set_ipaddr(&gnetif, &ipaddr);
-    // netif_set_netmask(&gnetif, &netmask);
-    // netif_set_gw(&gnetif, &gw);
+    //Разрешаем прием
+    DMARxDscrTab -> Status = ETH_DMARxDesc_OWN;
+
+    // ETH_MACAddressConfig(ETH_MAC_Address1, MAC_ADDR);
+    // ETH_MACAddressFilterConfig(ETH_MAC_Address1,ETH_MAC_AddressFilter_SA);
+    // ETH_MACAddressPerfectFilterCmd(ETH_MAC_Address1, ENABLE);
+
+    /* Enable MAC and DMA transmission and reception */
+    ETH_Start();  
 }
 
 void board_init() {
@@ -145,3 +169,21 @@ uint32_t getRegister() {
     return EthStatus;
 }
 
+void transmitPacket() {
+    if ((DMATxDscrTab->Status & ETH_DMARxDesc_OWN)==0){   
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_7);
+
+        //Сначала отключаем передачу
+        ETH_DMATransmissionCmd(DISABLE);
+
+        Tx_Buff[0][20] = 0x01;
+        Tx_Buff[0][21] = 0x02;
+
+        //отдаем дескриптор в руки DMA Ethernet
+        DMATxDscrTab -> Status = ETH_DMARxDesc_OWN | ETH_DMATxDesc_TCH | ETH_DMATxDesc_TTSE |
+                        ETH_DMATxDesc_LS | ETH_DMATxDesc_FS;
+                    
+                        //разрешаем отправку
+        ETH_DMATransmissionCmd(ENABLE);
+    }
+}

@@ -1,4 +1,4 @@
-project(stm32f4xx C ASM)
+project(stm32f4_lib C ASM)
 
 set(DEVICE_FAMILY STM32F439xx)
 get_filename_component(LINKER_SCRIPT src/stm32f439zi_flash.ld ABSOLUTE)
@@ -6,7 +6,8 @@ get_filename_component(LINKER_SCRIPT src/stm32f439zi_flash.ld ABSOLUTE)
 add_library(stm32f4xx STATIC   
     src/STM32F4xx_StdPeriph_Driver/misc.c
     # src/STM32F4xx_StdPeriph_Driver/stm32f4x7_eth_bsp.c
-    src/STM32F4xx_StdPeriph_Driver/stm32f4x7_eth.c
+    # src/STM32F4xx_StdPeriph_Driver/stm32f4xx_hal_eth.c
+    # src/STM32F4xx_StdPeriph_Driver/stm32f4x7_eth.c
     # src/STM32F4xx_StdPeriph_Driver/stm32f4xx_adc.c
     # src/STM32F4xx_StdPeriph_Driver/stm32f4xx_can.c
     # src/STM32F4xx_StdPeriph_Driver/stm32f4xx_crc.c
@@ -52,5 +53,5 @@ target_compile_definitions(stm32f4xx PUBLIC ${DEVICE_FAMILY})
 target_compile_definitions(stm32f4xx PUBLIC HSE_VALUE=8000000)
 target_compile_definitions(stm32f4xx PUBLIC USE_STM324x7I_EVAL)
 
-target_compile_options(stm32f4xx PRIVATE -Wall -Wextra -Os -nostartfiles)
+target_compile_options(stm32f4xx PRIVATE -nostartfiles)
 target_link_libraries(stm32f4xx PUBLIC -T${LINKER_SCRIPT})

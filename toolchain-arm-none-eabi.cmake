@@ -20,5 +20,6 @@ set(shared_options "-mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork -m
 set(CMAKE_C_FLAGS_INIT "${shared_options}" CACHE INTERNAL "Initial options for C compiler.")
 set(CMAKE_CXX_FLAGS_INIT "${shared_options}" CACHE INTERNAL "Initial options for C++ compiler.")
 set(CMAKE_EXE_LINKER_FLAGS_INIT "-Wl,--gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map" CACHE INTERNAL "Initial options for executable linker.")
+# set(CMAKE_EXE_LINKER_FLAGS_INIT "${CMAKE_EXE_LINKER_FLAGS_INIT}, -T ${CMAKE_SOURCE_DIR}/lib/src/stm32f439zi_flash.ld")
 
 

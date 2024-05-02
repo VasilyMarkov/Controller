@@ -5,7 +5,6 @@ get_filename_component(LINKER_SCRIPT src/stm32f439zi_flash.ld ABSOLUTE)
 
 add_library(stm32f4xx STATIC   
     src/STM32F4xx_StdPeriph_Driver/misc.c
-    # src/STM32F4xx_StdPeriph_Driver/stm32f4x7_eth_bsp.c
     # src/STM32F4xx_StdPeriph_Driver/stm32f4xx_hal_eth.c
     # src/STM32F4xx_StdPeriph_Driver/stm32f4x7_eth.c
     # src/STM32F4xx_StdPeriph_Driver/stm32f4xx_adc.c
@@ -18,7 +17,7 @@ add_library(stm32f4xx STATIC
     # src/STM32F4xx_StdPeriph_Driver/stm32f4xx_dac.c
     # src/STM32F4xx_StdPeriph_Driver/stm32f4xx_dbgmcu.c
     # src/STM32F4xx_StdPeriph_Driver/stm32f4xx_dcmi.c
-    # src/STM32F4xx_StdPeriph_Driver/stm32f4xx_dma.c
+    src/STM32F4xx_StdPeriph_Driver/stm32f4xx_dma.c
     # src/STM32F4xx_StdPeriph_Driver/stm32f4xx_exti.c
     # src/STM32F4xx_StdPeriph_Driver/stm32f4xx_flash.c
     # src/STM32F4xx_StdPeriph_Driver/stm32f4xx_fsmc.c

@@ -203,9 +203,8 @@ HAL_StatusTypeDef HAL_ETH_Init(ETH_HandleTypeDef *heth)
   }
   
   /* Enable SYSCFG Clock */
-  __HAL_RCC_SYSCFG_CLK_ENABLE();
-  RCC_APB2ENR_SYSCFGEN
-  
+  //__HAL_RCC_SYSCFG_CLK_ENABLE();
+  RCC_APB2PeriphClockCmd(RCC_APB2ENR_SYSCFGEN, ENABLE);
   /* Select MII or RMII Mode*/
   SYSCFG->PMC &= ~(SYSCFG_PMC_MII_RMII_SEL);
   SYSCFG->PMC |= (uint32_t)heth->Init.MediaInterface;
@@ -242,7 +241,7 @@ HAL_StatusTypeDef HAL_ETH_Init(ETH_HandleTypeDef *heth)
   tmpreg1 &= ETH_MACMIIAR_CR_MASK;
   
   /* Get hclk frequency value */
-  hclk = SystemCoreClock;
+  hclk = SystemCoreClock; 
   
   /* Set CR bits depending on hclk value */
   if((hclk >= 20000000U)&&(hclk < 35000000U))

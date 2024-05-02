@@ -1,7 +1,9 @@
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
+#include "stm32f4xx_dma.h"
 #include "misc.h"
 #include "bsp.h"
+#include "lwip.h"
 
 #define MAX_DELAY 0xFFFFFFFU
 #define INTERVAL 500
@@ -105,28 +107,38 @@ void usart_init() {
     usart.USART_BaudRate = 115200;
     usart.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
     USART_Init(USART2, &usart);
-    USART_Cmd(USART2, ENABLE);
-    
-    //NVIC_EnableIRQ(USART2_IRQn);
+    USART_Cmd(USART2, ENABLE);    
 }
 
-void eth_init() {
-
+void dma_init() {
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
+    DMA_InitTypeDef dma;
+    dma.DMA_Channel = DMA_Channel_0;
+    dma.DMA_DIR = DMA_DIR_MemoryToMemory;
+    dma.DMA_PeripheralInc = DMA_PeripheralInc_Enable;
+    dma.DMA_MemoryInc = DMA_MemoryInc_Enable;
+    dma.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+    dma.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+    dma.DMA_Mode = DMA_Mode_Normal;
+    dma.DMA_Priority = DMA_Priority_Low;
+    dma.DMA_FIFOMode = DMA_FIFOMode_Enable;
+    dma.DMA_FIFOThreshold = DMA_FIFOThreshold_Full;
+    dma.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
+    dma.DMA_MemoryBurst = DMA_MemoryBurst_Single;
+    DMA_Init(DMA2_Stream0, &dma);
 }
 
 void board_init() {
     uint32_t tick = SystemCoreClock/1000;
-    
     SysTick_Config(tick);
     NVIC_EnableIRQ(SysTick_IRQn);
     __enable_irq(); 
     gpio_init();
     usart_init();
+    dma_init();
+    init_LWIP();
     delay(50); //wait until periph init
     printf("Controller is started...\r\n");
 }
 
-// uint32_t getRegister() {
-//     return EthStatus;
-// }
 

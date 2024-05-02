@@ -56,13 +56,9 @@
 #include "netif/etharp.h"
 #include "lwip/ethip6.h"
 #include "ethernetif.h"
-#include "stm32f4xx_hal_eth.h"
 #include <string.h>
-
-/* Within 'USER CODE' section, code will be kept by default at each generation */
-/* USER CODE BEGIN 0 */
+#include "bsp.h"
 #include <stdio.h>
-/* USER CODE END 0 */
 
 /* Private define ------------------------------------------------------------*/
 
@@ -70,9 +66,6 @@
 #define IFNAME0 's'
 #define IFNAME1 't'
 
-/* USER CODE BEGIN 1 */
-
-/* USER CODE END 1 */
 
 /* Private variables ---------------------------------------------------------*/
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
@@ -95,120 +88,13 @@ __ALIGN_BEGIN uint8_t Rx_Buff[ETH_RXBUFNB][ETH_RX_BUF_SIZE] __ALIGN_END; /* Ethe
 #endif
 __ALIGN_BEGIN uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE] __ALIGN_END; /* Ethernet Transmit Buffer */
 
-/* USER CODE BEGIN 2 */
-
-/* USER CODE END 2 */
 
 /* Global Ethernet handle */
 ETH_HandleTypeDef heth;
 
-/* USER CODE BEGIN 3 */
-
-/* USER CODE END 3 */
-
-/* Private functions ---------------------------------------------------------*/
-
-// void HAL_ETH_MspInit(ETH_HandleTypeDef* ethHandle)
-// {
-//   GPIO_InitTypeDef GPIO_InitStruct;
-//   if(ethHandle->Instance==ETH)
-//   {
-//   /* USER CODE BEGIN ETH_MspInit 0 */
-
-//   /* USER CODE END ETH_MspInit 0 */
-//     /* Enable Peripheral clock */
-//     __HAL_RCC_ETH_CLK_ENABLE();
-  
-//     /**ETH GPIO Configuration    
-//     PC1     ------> ETH_MDC
-//     PA1     ------> ETH_REF_CLK
-//     PA2     ------> ETH_MDIO
-//     PA7     ------> ETH_CRS_DV
-//     PC4     ------> ETH_RXD0
-//     PC5     ------> ETH_RXD1
-//     PB13     ------> ETH_TXD1
-//     PG11     ------> ETH_TX_EN
-//     PG13     ------> ETH_TXD0 
-//     */
-//     GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_5;
-//     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-//     GPIO_InitStruct.Pull = GPIO_NOPULL;
-//     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-//     GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-//     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-//     GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_7;
-//     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-//     GPIO_InitStruct.Pull = GPIO_NOPULL;
-//     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-//     GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-//     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-//     GPIO_InitStruct.Pin = GPIO_PIN_13;
-//     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-//     GPIO_InitStruct.Pull = GPIO_NOPULL;
-//     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-//     GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-//     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-//     GPIO_InitStruct.Pin = GPIO_PIN_11|GPIO_PIN_13;
-//     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-//     GPIO_InitStruct.Pull = GPIO_NOPULL;
-//     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-//     GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-//     HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
-
-//     /* Peripheral interrupt init */
-//     HAL_NVIC_SetPriority(ETH_IRQn, 0, 0);
-//     HAL_NVIC_EnableIRQ(ETH_IRQn);
-//   /* USER CODE BEGIN ETH_MspInit 1 */
-
-//   /* USER CODE END ETH_MspInit 1 */
-//   }
-// }
-
-// void HAL_ETH_MspDeInit(ETH_HandleTypeDef* ethHandle)
-// {
-//   if(ethHandle->Instance==ETH)
-//   {
-//   /* USER CODE BEGIN ETH_MspDeInit 0 */
-
-//   /* USER CODE END ETH_MspDeInit 0 */
-//     /* Peripheral clock disable */
-//     __HAL_RCC_ETH_CLK_DISABLE();
-  
-//     /**ETH GPIO Configuration    
-//     PC1     ------> ETH_MDC
-//     PA1     ------> ETH_REF_CLK
-//     PA2     ------> ETH_MDIO
-//     PA7     ------> ETH_CRS_DV
-//     PC4     ------> ETH_RXD0
-//     PC5     ------> ETH_RXD1
-//     PB13     ------> ETH_TXD1
-//     PG11     ------> ETH_TX_EN
-//     PG13     ------> ETH_TXD0 
-//     */
-//     HAL_GPIO_DeInit(GPIOC, GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_5);
-
-//     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_7);
-
-//     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_13);
-
-//     HAL_GPIO_DeInit(GPIOG, GPIO_PIN_11|GPIO_PIN_13);
-
-//     /* Peripheral interrupt Deinit*/
-//     HAL_NVIC_DisableIRQ(ETH_IRQn);
-
-//   /* USER CODE BEGIN ETH_MspDeInit 1 */
-
-//   /* USER CODE END ETH_MspDeInit 1 */
-//   }
-// }
-
-/* USER CODE BEGIN 4 */
-
-/* USER CODE END 4 */
-
+ETH_HandleTypeDef* getEthStruct() {
+  return &heth;
+}
 /*******************************************************************************
                        LL Driver Interface ( LwIP stack --> ETH) 
 *******************************************************************************/
@@ -224,7 +110,6 @@ static void low_level_init(struct netif *netif)
   uint32_t regvalue = 0;
   HAL_StatusTypeDef hal_eth_init_status;
   
-/* Init ETH */
 
    uint8_t MACAddr[6] ;
   heth.Instance = ETH;
@@ -241,13 +126,11 @@ static void low_level_init(struct netif *netif)
   heth.Init.ChecksumMode = ETH_CHECKSUM_BY_HARDWARE;
   heth.Init.MediaInterface = ETH_MEDIA_INTERFACE_RMII;
 
-  /* USER CODE BEGIN MACADDRESS */
   printf("LAN8742A PHYAD: 0x0\r\r\n");
   printf("Setting MACaddr: %02x:%02x:%02x:%02x:%02x:%02x\r\r\n",
 		  MACAddr[0], MACAddr[1], MACAddr[2],
 		  MACAddr[3], MACAddr[4], MACAddr[5]);
   printf("LAN8742A interface is RMII\r\r\n");
-  /* USER CODE END MACADDRESS */
 
   hal_eth_init_status = HAL_ETH_Init(&heth);
 
@@ -289,9 +172,9 @@ static void low_level_init(struct netif *netif)
   /* Enable MAC and DMA transmission and reception */
   HAL_ETH_Start(&heth);
 
-/* USER CODE BEGIN PHY_PRE_CONFIG */ 
-   printf("Starting Ethernet IRQ/DMA..\r\r\n");
-/* USER CODE END PHY_PRE_CONFIG */
+
+  printf("Starting Ethernet IRQ/DMA..\r\r\n");
+
   
 
   /* Read Register Configuration */
@@ -303,33 +186,12 @@ static void low_level_init(struct netif *netif)
   
   /* Read Register Configuration */
   HAL_ETH_ReadPHYRegister(&heth, PHY_ISFR , &regvalue);
+  printf("Link: %d\r\n", regvalue);
 
-/* USER CODE BEGIN PHY_POST_CONFIG */ 
-    
-/* USER CODE END PHY_POST_CONFIG */
+#endif 
 
-#endif /* LWIP_ARP || LWIP_ETHERNET */
-
-/* USER CODE BEGIN LOW_LEVEL_INIT */ 
-    
-/* USER CODE END LOW_LEVEL_INIT */
 }
 
-/**
- * This function should do the actual transmission of the packet. The packet is
- * contained in the pbuf that is passed to the function. This pbuf
- * might be chained.
- *
- * @param netif the lwip network interface structure for this ethernetif
- * @param p the MAC packet to send (e.g. IP packet including MAC addresses and type)
- * @return ERR_OK if the packet could be sent
- *         an err_t value if the packet couldn't be sent
- *
- * @note Returning ERR_MEM here if a DMA queue of your MAC is full can lead to
- *       strange results. You might consider waiting for space in the DMA queue
- *       to become availale since the stack doesn't retry to send a packet
- *       dropped because of memory failure (except for the TCP timers).
- */
 
 static err_t low_level_output(struct netif *netif, struct pbuf *p)
 {
@@ -538,10 +400,6 @@ static err_t low_level_output_arp_off(struct netif *netif, struct pbuf *q, const
   err_t errval;
   errval = ERR_OK;
     
-/* USER CODE BEGIN 5 */ 
-    
-/* USER CODE END 5 */  
-    
   return errval;
   
 }
@@ -598,8 +456,6 @@ err_t ethernetif_init(struct netif *netif)
   return ERR_OK;
 }
 
-/* USER CODE BEGIN 6 */
-
 /**
 * @brief  Returns the current time in milliseconds
 *         when LWIP_TIMERS == 1 and NO_SYS == 1
@@ -621,12 +477,6 @@ u32_t sys_now(void)
 {
   return getSysTick();
 }
-
-/* USER CODE END 6 */
-
-/* USER CODE BEGIN 7 */
-
-/* USER CODE END 7 */
 
 #if LWIP_NETIF_LINK_CALLBACK
 /**
@@ -717,7 +567,6 @@ void ethernetif_update_config(struct netif *netif)
   ethernetif_notify_conn_changed(netif);
 }
 
-/* USER CODE BEGIN 8 */
 /**
   * @brief  This function notify user about link status changement.
   * @param  netif: the network interface
@@ -730,11 +579,7 @@ __weak void ethernetif_notify_conn_changed(struct netif *netif)
   */
 
 }
-/* USER CODE END 8 */ 
 #endif /* LWIP_NETIF_LINK_CALLBACK */
 
-/* USER CODE BEGIN 9 */
 
-/* USER CODE END 9 */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

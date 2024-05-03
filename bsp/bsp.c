@@ -43,7 +43,6 @@ void USART2_IRQHandler()
 void gpio_init() {
 
     const uint16_t led_pins = GPIO_Pin_0 | GPIO_Pin_7 | GPIO_Pin_14;
-    const uint16_t usart_pins = GPIO_Pin_5 | GPIO_Pin_6;
 
     RCC_AHB1PeriphClockCmd(
         RCC_AHB1Periph_GPIOA | 
@@ -56,15 +55,19 @@ void gpio_init() {
 
     GPIO_InitTypeDef gpio;
 
-/***************LED_CONF********************/
     GPIO_StructInit(&gpio);
     gpio.GPIO_Mode = GPIO_Mode_OUT;
     gpio.GPIO_Pin = led_pins;
     GPIO_Init(GPIOB, &gpio);
     GPIO_ResetBits(GPIOB, led_pins);
-/*******************************************/
 
-/**************UART_CONF********************/
+}
+
+void usart_init() {
+
+    GPIO_InitTypeDef gpio;
+
+    const uint16_t usart_pins = GPIO_Pin_5 | GPIO_Pin_6;
     gpio.GPIO_Mode = GPIO_Mode_AF;
     gpio.GPIO_Pin = usart_pins;
     gpio.GPIO_Speed = GPIO_Speed_50MHz;
@@ -74,34 +77,7 @@ void gpio_init() {
 
     GPIO_PinAFConfig(GPIOD, GPIO_PinSource5, GPIO_AF_USART2);
     GPIO_PinAFConfig(GPIOD, GPIO_PinSource6, GPIO_AF_USART2);
-/*******************************************/
 
-/***************ETH_CONF********************/
-    gpio.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_7; 
-    GPIO_Init(GPIOA, &gpio);
-    GPIO_PinAFConfig(GPIOA, GPIO_PinSource1, GPIO_AF_ETH); //RMII ref clock
-    GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_ETH); //RMII MDIO
-    GPIO_PinAFConfig(GPIOA, GPIO_PinSource7, GPIO_AF_ETH); //RMII RX Data Valid
-
-    gpio.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5;
-    GPIO_Init(GPIOC, &gpio);
-    GPIO_PinAFConfig(GPIOC, GPIO_PinSource1, GPIO_AF_ETH); //RMII MDC
-    GPIO_PinAFConfig(GPIOC, GPIO_PinSource4, GPIO_AF_ETH); //RMII RXD0
-    GPIO_PinAFConfig(GPIOC, GPIO_PinSource5, GPIO_AF_ETH); //RMII RXD1
-
-    gpio.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_13;
-    GPIO_Init(GPIOG, &gpio);
-    GPIO_PinAFConfig(GPIOG, GPIO_PinSource11, GPIO_AF_ETH); //RMII TX enable
-    GPIO_PinAFConfig(GPIOG, GPIO_PinSource13, GPIO_AF_ETH); //RMII TXD0
-
-    gpio.GPIO_Pin = GPIO_Pin_13;
-    GPIO_Init(GPIOB, &gpio);
-    GPIO_PinAFConfig(GPIOB, GPIO_PinSource13, GPIO_AF_ETH); //RMII TXD1
-/*******************************************/
-
-}
-
-void usart_init() {
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
     USART_InitTypeDef usart;
     usart.USART_BaudRate = 115200;
@@ -128,6 +104,44 @@ void dma_init() {
     DMA_Init(DMA2_Stream0, &dma);
 }
 
+
+void eth_init() {
+    GPIO_InitTypeDef gpio;
+
+    gpio.GPIO_Mode = GPIO_Mode_AF;
+    gpio.GPIO_Speed = GPIO_Speed_100MHz;
+    gpio.GPIO_OType = GPIO_OType_PP;
+    gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
+
+    gpio.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_7; 
+    GPIO_Init(GPIOA, &gpio);
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource1, GPIO_AF_ETH); //RMII ref clock
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_ETH); //RMII MDIO
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource7, GPIO_AF_ETH); //RMII RX Data Valid
+    
+    gpio.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5;
+    GPIO_Init(GPIOC, &gpio);
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource1, GPIO_AF_ETH); //RMII MDC
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource4, GPIO_AF_ETH); //RMII RXD0
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource5, GPIO_AF_ETH); //RMII RXD1
+
+    gpio.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_13;
+    GPIO_Init(GPIOG, &gpio);
+    GPIO_PinAFConfig(GPIOG, GPIO_PinSource11, GPIO_AF_ETH); //RMII TX enable
+    GPIO_PinAFConfig(GPIOG, GPIO_PinSource13, GPIO_AF_ETH); //RMII TXD0
+
+    gpio.GPIO_Pin = GPIO_Pin_13;
+    GPIO_Init(GPIOB, &gpio);
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource13, GPIO_AF_ETH); //RMII TXD1
+
+    RCC_AHB1PeriphClockCmd(RCC_AHB1ENR_ETHMACEN, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1ENR_ETHMACRXEN, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1ENR_ETHMACTXEN, ENABLE);
+    NVIC_SetPriority(ETH_IRQn, 0);
+    NVIC_EnableIRQ(ETH_IRQn);
+}
+
+
 void board_init() {
     uint32_t tick = SystemCoreClock/1000;
     SysTick_Config(tick);
@@ -135,7 +149,8 @@ void board_init() {
     __enable_irq(); 
     gpio_init();
     usart_init();
-    dma_init();
+    // dma_init();
+    eth_init();
     init_LWIP();
     delay(50); //wait until periph init
     printf("Controller is started...\r\n");

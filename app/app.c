@@ -10,7 +10,6 @@ void app() {
         HAL_ETH_ReadPHYRegister(getEthStruct(), 1, &regvalue);
         delay(500);
         printf("Test: %d\r\n", regvalue);
-        // process_LWIP();
     };
 }
 

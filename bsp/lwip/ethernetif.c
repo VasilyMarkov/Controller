@@ -59,7 +59,6 @@
 #include <string.h>
 #include "bsp.h"
 #include <stdio.h>
-
 /* Private define ------------------------------------------------------------*/
 
 /* Network interface name */
@@ -95,6 +94,7 @@ ETH_HandleTypeDef heth;
 ETH_HandleTypeDef* getEthStruct() {
   return &heth;
 }
+
 /*******************************************************************************
                        LL Driver Interface ( LwIP stack --> ETH) 
 *******************************************************************************/
@@ -111,7 +111,7 @@ static void low_level_init(struct netif *netif)
   HAL_StatusTypeDef hal_eth_init_status;
   
 
-   uint8_t MACAddr[6] ;
+  uint8_t MACAddr[6] ;
   heth.Instance = ETH;
   heth.Init.AutoNegotiation = ETH_AUTONEGOTIATION_ENABLE;
   heth.Init.PhyAddress = LAN8742A_PHY_ADDRESS;
@@ -133,7 +133,7 @@ static void low_level_init(struct netif *netif)
   printf("LAN8742A interface is RMII\r\r\n");
 
   hal_eth_init_status = HAL_ETH_Init(&heth);
-
+  printf("Status: %d\r\n", hal_eth_init_status);
   if (hal_eth_init_status == HAL_OK)
   {
     /* Set netif link flag */  
@@ -172,10 +172,7 @@ static void low_level_init(struct netif *netif)
   /* Enable MAC and DMA transmission and reception */
   HAL_ETH_Start(&heth);
 
-
   printf("Starting Ethernet IRQ/DMA..\r\r\n");
-
-  
 
   /* Read Register Configuration */
   HAL_ETH_ReadPHYRegister(&heth, PHY_ISFR, &regvalue);

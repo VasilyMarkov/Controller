@@ -12,13 +12,7 @@ static volatile uint32_t cnt = 0;
 void SysTick_Handler(void)
 {
     if (cnt == INTERVAL) {
-
-        // uint32_t regvalue = 0;
-        // HAL_ETH_ReadPHYRegister(getEthStruct(), 1, &regvalue);
-
-        // printf("PHY: %d\r\n", regvalue);
-
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
         cnt = 0;
     }
     sysTick++;
@@ -36,6 +30,16 @@ void delay(uint32_t delay) {
         wait++;
     }
     while((getSysTick() - tickStart) < wait) {}
+}
+
+void TIM2_IRQHandler()
+{
+    GPIO_ToggleBits(GPIOB, GPIO_Pin_7);
+    printf("Tim\r\n");
+    printf("Tim\r\n");
+    printf("Tim\r\n");
+    printf("Tim\r\n");
+    TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 }
 
 void USART2_IRQHandler()
@@ -87,6 +91,22 @@ void usart_init() {
     USART_Cmd(USART2, ENABLE);    
 }
 
+void tim_init() {
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+    TIM_TimeBaseInitTypeDef tim2;
+
+    tim2.TIM_Prescaler = 9000-1;
+    tim2.TIM_CounterMode = TIM_CounterMode_Up;
+    tim2.TIM_Period = 5000;
+    tim2.TIM_ClockDivision = TIM_CKD_DIV1;
+    
+    TIM_TimeBaseInit(TIM2, &tim2);
+    
+    TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
+    NVIC_SetPriority(TIM2_IRQn, 0);
+    NVIC_EnableIRQ(TIM2_IRQn);
+}
+
 void dma_init() {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
     DMA_InitTypeDef dma;
@@ -104,7 +124,6 @@ void dma_init() {
     dma.DMA_MemoryBurst = DMA_MemoryBurst_Single;
     DMA_Init(DMA2_Stream0, &dma);
 }
-
 
 void eth_init() {
 
@@ -149,12 +168,14 @@ void board_init() {
     uint32_t tick = SystemCoreClock/1000 - 1;
     SysTick_Config(tick);
     NVIC_EnableIRQ(SysTick_IRQn);
-    // __enable_irq(); 
+    __enable_irq();
     gpio_init();
     usart_init();
+    tim_init();
     // dma_init();
     eth_init();
     init_LWIP();
+    TIM_Cmd(TIM2, ENABLE);
     printf("Controller is started...\r\n");
 }
 

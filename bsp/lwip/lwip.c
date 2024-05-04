@@ -65,6 +65,6 @@ void init_LWIP(void)
 void process_LWIP()
 {
   ethernetif_input(&gnetif);
-  sys_check_timeouts();
+  // sys_check_timeouts();
 }
 

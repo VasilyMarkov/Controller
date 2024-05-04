@@ -76,7 +76,7 @@
 /* LwIP Stack Parameters (modified compared to initialization value in opt.h) -*/
 /* Parameters set in STM32CubeMX LwIP Configuration GUI -*/
 /*----- Value in opt.h for LWIP_DHCP: 0 -----*/
-#define LWIP_DHCP 1
+#define LWIP_DHCP 0
 /*----- Value in opt.h for NO_SYS: 0 -----*/
 #define NO_SYS 1
 /*----- Value in opt.h for SYS_LIGHTWEIGHT_PROT: 1 -----*/
@@ -128,19 +128,19 @@
 /*----- Value in opt.h for CHECKSUM_CHECK_ICMP6: 1 -----*/
 #define CHECKSUM_CHECK_ICMP6 0
 /*----- Default Value for ETHARP_DEBUG: LWIP_DBG_OFF ---*/
-#define ETHARP_DEBUG LWIP_DBG_ON
+#define ETHARP_DEBUG LWIP_DBG_OFF
 /*----- Default Value for NETIF_DEBUG: LWIP_DBG_OFF ---*/
-#define NETIF_DEBUG LWIP_DBG_ON
+#define NETIF_DEBUG LWIP_DBG_OFF
 /*----- Default Value for PBUF_DEBUG: LWIP_DBG_OFF ---*/
 #define PBUF_DEBUG LWIP_DBG_OFF
 /*----- Default Value for ICMP_DEBUG: LWIP_DBG_OFF ---*/
-#define ICMP_DEBUG LWIP_DBG_ON
+#define ICMP_DEBUG LWIP_DBG_OFF
 /*----- Default Value for SYS_DEBUG: LWIP_DBG_OFF ---*/
-#define SYS_DEBUG LWIP_DBG_ON
+#define SYS_DEBUG LWIP_DBG_OFF
 /*----- Default Value for UDP_DEBUG: LWIP_DBG_OFF ---*/
-#define UDP_DEBUG LWIP_DBG_ON
+#define UDP_DEBUG LWIP_DBG_OFF
 /*----- Default Value for DHCP_DEBUG: LWIP_DBG_OFF ---*/
-#define DHCP_DEBUG LWIP_DBG_ON
+#define DHCP_DEBUG LWIP_DBG_OFF
 /*-----------------------------------------------------------------------------*/
 /* USER CODE BEGIN 1 */
 #define LWIP_DEBUG 1
@@ -148,6 +148,8 @@
 #define LWIP_UDP 1
 
 #define LWIP_TCP 0
+
+#define LWIP_NETIF_LINK_CALLBACK 1
 /* USER CODE END 1 */
 
 #ifdef __cplusplus

@@ -2,11 +2,6 @@ set(LWIP_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lwip/src)
 set(LWIP_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/lwip/src/include)
 set(LWIP_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/lwip/src/core)
 
-file(GLOB_RECURSE LWIP_SOURCES 
-    ${LWIP_SOURCE_DIR}/core/*.c
-    ${LWIP_SOURCE_DIR}/netif/*.c
-)
-
 add_library(bsp STATIC    
     bsp.c
     lwip/lwip.c

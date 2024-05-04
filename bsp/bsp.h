@@ -3,7 +3,9 @@
 
 #include "stm32f4xx.h"
 #include "stm32f4xx_usart.h"
-
+#include "stm32f4xx_gpio.h"
+#include "stm32f4xx_rcc.h"
+#include "stm32f4xx_dma.h"
 void board_init();
 uint32_t getRegister();
 uint32_t getSysTick();

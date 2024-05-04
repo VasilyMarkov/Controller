@@ -1,6 +1,3 @@
-#include "stm32f4xx_gpio.h"
-#include "stm32f4xx_rcc.h"
-#include "stm32f4xx_dma.h"
 #include "misc.h"
 #include "bsp.h"
 #include "lwip.h"
@@ -15,6 +12,12 @@ static volatile uint32_t cnt = 0;
 void SysTick_Handler(void)
 {
     if (cnt == INTERVAL) {
+
+        // uint32_t regvalue = 0;
+        // HAL_ETH_ReadPHYRegister(getEthStruct(), 1, &regvalue);
+
+        // printf("PHY: %d\r\n", regvalue);
+
         GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
         cnt = 0;
     }
@@ -52,7 +55,6 @@ void gpio_init() {
         RCC_AHB1Periph_GPIOG, 
         ENABLE
     );
-
     GPIO_InitTypeDef gpio;
 
     GPIO_StructInit(&gpio);
@@ -60,7 +62,6 @@ void gpio_init() {
     gpio.GPIO_Pin = led_pins;
     GPIO_Init(GPIOB, &gpio);
     GPIO_ResetBits(GPIOB, led_pins);
-
 }
 
 void usart_init() {
@@ -106,6 +107,11 @@ void dma_init() {
 
 
 void eth_init() {
+
+    RCC_AHB1PeriphClockCmd(RCC_AHB1ENR_ETHMACEN, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1ENR_ETHMACRXEN, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1ENR_ETHMACTXEN, ENABLE);
+
     GPIO_InitTypeDef gpio;
 
     gpio.GPIO_Mode = GPIO_Mode_AF;
@@ -134,25 +140,21 @@ void eth_init() {
     GPIO_Init(GPIOB, &gpio);
     GPIO_PinAFConfig(GPIOB, GPIO_PinSource13, GPIO_AF_ETH); //RMII TXD1
 
-    RCC_AHB1PeriphClockCmd(RCC_AHB1ENR_ETHMACEN, ENABLE);
-    RCC_AHB1PeriphClockCmd(RCC_AHB1ENR_ETHMACRXEN, ENABLE);
-    RCC_AHB1PeriphClockCmd(RCC_AHB1ENR_ETHMACTXEN, ENABLE);
     NVIC_SetPriority(ETH_IRQn, 0);
     NVIC_EnableIRQ(ETH_IRQn);
 }
 
 
 void board_init() {
-    uint32_t tick = SystemCoreClock/1000;
+    uint32_t tick = SystemCoreClock/1000 - 1;
     SysTick_Config(tick);
     NVIC_EnableIRQ(SysTick_IRQn);
-    __enable_irq(); 
+    // __enable_irq(); 
     gpio_init();
     usart_init();
     // dma_init();
     eth_init();
     init_LWIP();
-    delay(50); //wait until periph init
     printf("Controller is started...\r\n");
 }
 

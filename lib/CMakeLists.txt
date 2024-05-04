@@ -1,7 +1,8 @@
 project(stm32f4_lib C ASM)
 
 set(DEVICE_FAMILY STM32F439xx)
-get_filename_component(LINKER_SCRIPT src/stm32f439zi_flash.ld ABSOLUTE)
+# get_filename_component(LINKER_SCRIPT src/stm32f439zi_flash.ld ABSOLUTE)
+get_filename_component(LINKER_SCRIPT src/STM32F439ZITx_FLASH.ld ABSOLUTE)
 
 add_library(stm32f4xx STATIC   
     src/STM32F4xx_StdPeriph_Driver/misc.c
@@ -38,7 +39,8 @@ add_library(stm32f4xx STATIC
     src/STM32F4xx_StdPeriph_Driver/stm32f4xx_usart.c
     # src/STM32F4xx_StdPeriph_Driver/stm32f4xx_wwdg.c  
     src/system_stm32f4xx.c
-    src/startup_stm32f4xx.S
+    # src/startup_stm32f4xx.S
+    src/startup_stm32f439xx.S
 )
 
 target_include_directories(stm32f4xx PUBLIC 
@@ -50,6 +52,7 @@ target_include_directories(stm32f4xx PUBLIC
 target_compile_definitions(stm32f4xx PUBLIC USE_STDPERIPH_DRIVER)
 target_compile_definitions(stm32f4xx PUBLIC ${DEVICE_FAMILY})
 target_compile_definitions(stm32f4xx PUBLIC HSE_VALUE=8000000)
+target_compile_definitions(stm32f4xx PUBLIC SYSTEM_CORE_CLOCK=180000000)
 target_compile_definitions(stm32f4xx PUBLIC USE_STM324x7I_EVAL)
 
 target_compile_options(stm32f4xx PRIVATE -nostartfiles)

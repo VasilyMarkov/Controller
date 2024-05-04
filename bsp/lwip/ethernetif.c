@@ -290,7 +290,6 @@ static struct pbuf * low_level_input(struct netif *netif)
   /* get received frame */
   if (HAL_ETH_GetReceivedFrame(&heth) != HAL_OK)
     return NULL;
-  
   /* Obtain the size of the packet and put it into the "len" variable. */
   len = heth.RxFrameInfos.length;
   buffer = (uint8_t *)heth.RxFrameInfos.buffer;
@@ -354,6 +353,30 @@ static struct pbuf * low_level_input(struct netif *netif)
   return p;
 }
 
+void check_link_status(struct netif* netif) {
+  uint32_t regvalue = 0;
+  if (HAL_ETH_ReadPHYRegister(&heth, PHY_BSR, &regvalue) == HAL_OK)
+  {
+    if((regvalue & PHY_LINKED_STATUS)== (uint16_t)RESET) 
+    {
+        // Link status = disconnected
+        if (netif_is_link_up(netif))
+        {
+            netif_set_down(netif);
+            printf("unplugged\r\n");
+            netif_set_link_down(netif);
+        }
+    } else {
+        // Link status = connected
+        if (!netif_is_link_up(netif))
+        {
+            printf("plugged\r\n");
+            NVIC_SystemReset();
+        }
+    }
+  }
+}
+
 /**
  * This function should be called when a packet is ready to be read
  * from the interface. It uses the function low_level_input() that
@@ -365,24 +388,25 @@ static struct pbuf * low_level_input(struct netif *netif)
  */
 void ethernetif_input(struct netif *netif)
 {
-  err_t err;
-  struct pbuf *p;
-
-  /* move received packet into a new pbuf */
-  p = low_level_input(netif);
+  // err_t err;
+  // struct pbuf *p;
+  // uint32_t regvalue = 0;
+  // /* move received packet into a new pbuf */
+  // p = low_level_input(netif);
+  netif_set_link_callback(netif, ethernetif_update_config);
+  check_link_status(netif);
+  // /* no packet could be read, silently ignore this */
+  // if (p == NULL) return;
     
-  /* no packet could be read, silently ignore this */
-  if (p == NULL) return;
-    
-  /* entry point to the LwIP stack */
-  err = netif->input(p, netif);
-    
-  if (err != ERR_OK)
-  {
-    LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
-    pbuf_free(p);
-    p = NULL;    
-  }
+  // // /* entry point to the LwIP stack */
+  // err = netif->input(p, netif);
+  
+  // if (err != ERR_OK)
+  // {
+  //   LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
+  //   pbuf_free(p);
+  //   p = NULL;    
+  // }
 }
 
 #if !LWIP_ARP
@@ -486,9 +510,10 @@ void ethernetif_update_config(struct netif *netif)
 {
   __IO uint32_t tickstart = 0;
   uint32_t regvalue = 0;
-  
   if(netif_is_link_up(netif))
   { 
+    GPIO_SetBits(GPIOB, GPIO_Pin_0);
+    GPIO_SetBits(GPIOB, GPIO_Pin_7);
     /* Restart the auto-negotiation */
     if(heth.Init.AutoNegotiation != ETH_AUTONEGOTIATION_DISABLE)
     {
@@ -558,7 +583,9 @@ void ethernetif_update_config(struct netif *netif)
   else
   {
     /* Stop MAC interface */
-    HAL_ETH_Stop(&heth);
+    GPIO_ResetBits(GPIOB, GPIO_Pin_0);
+    GPIO_SetBits(GPIOB, GPIO_Pin_7);
+    // HAL_ETH_Stop(&heth);
   }
 
   ethernetif_notify_conn_changed(netif);

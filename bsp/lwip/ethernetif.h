@@ -4,6 +4,7 @@
 #include "lwip/err.h"
 #include "lwip/netif.h"
 #include "stm32f4xx_hal_eth.h"
+#include "bsp.h"
 
 err_t ethernetif_init(struct netif *netif);
 

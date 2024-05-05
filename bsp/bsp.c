@@ -1,26 +1,12 @@
 #include "misc.h"
 #include "bsp.h"
-#include "lwip.h"
 
 #define MAX_DELAY 0xFFFFFFFU
-#define INTERVAL 500
 
-static uint32_t EthStatus = 0;
-static volatile uint32_t sysTick = 0;
-static volatile uint32_t cnt = 0;
+static lwip_status_t lwip_status = {.link_status = LINK_DOWN};
 
-void SysTick_Handler(void)
-{
-    if (cnt == INTERVAL) {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
-        cnt = 0;
-    }
-    sysTick++;
-    cnt++;
-}   
-
-uint32_t getSysTick() {
-    return sysTick;
+lwip_status_t* get_lwip_status() {
+    return &lwip_status;
 }
 
 void delay(uint32_t delay) {
@@ -31,21 +17,6 @@ void delay(uint32_t delay) {
     }
     while((getSysTick() - tickStart) < wait) {}
 }
-
-void TIM2_IRQHandler()
-{
-    GPIO_ToggleBits(GPIOB, GPIO_Pin_7);
-    printf("Tim\r\n");
-    printf("Tim\r\n");
-    printf("Tim\r\n");
-    printf("Tim\r\n");
-    TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-}
-
-void USART2_IRQHandler()
-{
-
-}  
 
 void gpio_init() {
 
@@ -92,19 +63,26 @@ void usart_init() {
 }
 
 void tim_init() {
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-    TIM_TimeBaseInitTypeDef tim2;
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
+    TIM_TimeBaseInitTypeDef tim7;
 
-    tim2.TIM_Prescaler = 9000-1;
-    tim2.TIM_CounterMode = TIM_CounterMode_Up;
-    tim2.TIM_Period = 5000;
-    tim2.TIM_ClockDivision = TIM_CKD_DIV1;
+    TIM_TimeBaseStructInit(&tim7);
+
+    tim7.TIM_Prescaler = 9000-1;
+    tim7.TIM_CounterMode = TIM_CounterMode_Up;
+    tim7.TIM_Period = 2000;
+    tim7.TIM_ClockDivision = TIM_CKD_DIV1;
     
-    TIM_TimeBaseInit(TIM2, &tim2);
-    
-    TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
-    NVIC_SetPriority(TIM2_IRQn, 0);
-    NVIC_EnableIRQ(TIM2_IRQn);
+    TIM_TimeBaseInit(TIM7, &tim7);
+    TIM_ClearITPendingBit(TIM7, TIM_IT_Update);
+
+    TIM_UpdateRequestConfig(TIM7, TIM_UpdateSource_Regular);
+
+    TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
+    NVIC_SetPriority(TIM7_IRQn, 0);
+    NVIC_EnableIRQ(TIM7_IRQn);
+
+    TIM_Cmd(TIM7, ENABLE);
 }
 
 void dma_init() {
@@ -166,16 +144,15 @@ void eth_init() {
 
 void board_init() {
     uint32_t tick = SystemCoreClock/1000 - 1;
+    __enable_irq();
     SysTick_Config(tick);
     NVIC_EnableIRQ(SysTick_IRQn);
-    __enable_irq();
     gpio_init();
     usart_init();
-    tim_init();
     // dma_init();
     eth_init();
     init_LWIP();
-    TIM_Cmd(TIM2, ENABLE);
+    tim_init();
     printf("Controller is started...\r\n");
 }
 

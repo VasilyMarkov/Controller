@@ -4,6 +4,7 @@ set(LWIP_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/lwip/src/core)
 
 add_library(bsp STATIC    
     bsp.c
+    stm32f4xx_it.c
     lwip/lwip.c
     lwip/ethernetif.c
     lwip/stm32f4_eth_periph/src/stm32f4xx_hal_eth.c

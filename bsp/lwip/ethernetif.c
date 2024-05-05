@@ -57,7 +57,6 @@
 #include "lwip/ethip6.h"
 #include "ethernetif.h"
 #include <string.h>
-#include "bsp.h"
 #include <stdio.h>
 /* Private define ------------------------------------------------------------*/
 
@@ -359,20 +358,22 @@ void check_link_status(struct netif* netif) {
   {
     if((regvalue & PHY_LINKED_STATUS)== (uint16_t)RESET) 
     {
-        // Link status = disconnected
-        if (netif_is_link_up(netif))
-        {
-            netif_set_down(netif);
-            printf("unplugged\r\n");
-            netif_set_link_down(netif);
-        }
-    } else {
-        // Link status = connected
-        if (!netif_is_link_up(netif))
-        {
-            printf("plugged\r\n");
-            NVIC_SystemReset();
-        }
+      // Link status = disconnected
+      if (netif_is_link_up(netif))
+      {
+          netif_set_down(netif);
+          get_lwip_status()->link_status = LINK_DOWN;
+          netif_set_link_down(netif);
+      }
+    } 
+    else {
+      // Link status = connected
+      if (!netif_is_link_up(netif))
+      {
+          get_lwip_status()->link_status = LINK_UP;
+          NVIC_SystemReset();
+      }
+      get_lwip_status()->link_status = LINK_UP;
     }
   }
 }

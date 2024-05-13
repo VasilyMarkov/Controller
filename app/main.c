@@ -1,4 +1,7 @@
 #include "../bsp/bsp.h"
+#include <pb_encode.h>
+#include <pb_decode.h>
+#include "simple.pb.h"
 
 void MX_GPIO_Init(void)
 {
@@ -92,6 +95,71 @@ void eth_init() {
     NVIC_EnableIRQ(ETH_IRQn);
 }
 
+void serialzie() {
+    /* This is the buffer where we will store our message. */
+    uint8_t buffer[128];
+    size_t message_length;
+    bool status;
+    
+    /* Encode our message */
+    {
+        /* Allocate space on the stack to store the message data.
+         *
+         * Nanopb generates simple struct definitions for all the messages.
+         * - check out the contents of simple.pb.h!
+         * It is a good idea to always initialize your structures
+         * so that you do not have garbage data from RAM in there.
+         */
+        SimpleMessage message = SimpleMessage_init_zero;
+        
+        /* Create a stream that will write to our buffer. */
+        pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
+        
+        /* Fill in the lucky number */
+        message.number = 42;
+        /* Now we are ready to encode the message! */
+        status = pb_encode(&stream, SimpleMessage_fields, &message);
+        message_length = stream.bytes_written;
+        udp_send_data(buffer, message_length);
+        /* Then just check for any errors.. */
+        if (!status)
+        {
+            printf("Encoding failed: %s\n", PB_GET_ERROR(&stream));
+            return 1;
+        }
+    }
+    
+    /* Now we could transmit the message over network, store it in a file or
+     * wrap it to a pigeon's leg.
+     */
+
+    /* But because we are lazy, we will just decode it immediately. */
+    
+    // {
+    //     /* Allocate space for the decoded message. */
+    //     SimpleMessage message = SimpleMessage_init_zero;
+        
+    //     /* Create a stream that reads from the buffer. */
+    //     pb_istream_t stream = pb_istream_from_buffer(buffer, message_length);
+        
+    //     /* Now we are ready to decode the message. */
+    //     status = pb_decode(&stream, SimpleMessage_fields, &message);
+        
+    //     /* Check for errors... */
+    //     if (!status)
+    //     {
+    //         printf("Decoding failed: %s\n", PB_GET_ERROR(&stream));
+    //         return 1;
+    //     }
+        
+    //     /* Print the data contained in the message. */
+    //     // printf("Project: %s\n", message.project);
+    //     // printf("Number: %d\n", message.number);
+    // }
+    
+    return 0;
+}
+
 int main(void)
 {
 
@@ -114,12 +182,13 @@ int main(void)
   printf("RCC->PLLCFGR :%d\r\n", RCC->PLLCFGR);
   printf("RCC->APB1ENR :%d\r\n", RCC->APB1ENR);
   udpServer_init();
-
+  // serialzie();
   while (1)
   {
     MX_LWIP_Process(); // poll for ethernet rx and timer operations.
     const char *data = "Hello, world!";
     udp_send_data(data, strlen(data));
+    // serialzie();
     GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
     delay(500);
   }
@@ -128,30 +197,6 @@ int main(void)
 
 void SystemClock_Config()
 {
-  // SystemInit();
   SystemCoreClock = 180000000;
 }
 
-void Error_Handler(void)
-{
-  printf("Error Handler Triggered..\r\n");
-}
-
-#ifdef  USE_FULL_ASSERT
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t *file, uint32_t line)
-{ 
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
-}
-#endif /* USE_FULL_ASSERT */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

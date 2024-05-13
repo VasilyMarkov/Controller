@@ -11,6 +11,7 @@ add_library(bsp STATIC
     lwip/stm32f4xx_hal_eth.c
     ${LWIP_SOURCE_DIR}/api/err.c
     ${LWIP_SOURCE_DIR}/core/def.c
+    ${LWIP_SOURCE_DIR}/core/inet_chksum.c
     ${LWIP_SOURCE_DIR}/core/init.c
     ${LWIP_SOURCE_DIR}/core/ip.c
     ${LWIP_SOURCE_DIR}/core/mem.c

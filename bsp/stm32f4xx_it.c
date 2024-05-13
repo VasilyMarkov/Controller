@@ -1,42 +1,37 @@
 #include "stm32f4xx_it.h"
-#include "ring_buffer.h"
+#include "lwip/ethernetif.h"
 
-static volatile uint32_t sysTick = 0;
+// extern ETH_HandleTypeDef heth;
 
-void TIM7_IRQHandler()
-{
-    TIM_ClearITPendingBit(TIM7, TIM_IT_Update); 
-
-    if(get_lwip_status()->link_status == LINK_UP) {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_7); 
-    }
-    else {
-        GPIO_ResetBits(GPIOB, GPIO_Pin_7);
-    }
-}
-
-void USART2_IRQHandler()
-{
-    ringbuf_uint8t* printf_buffer =  get_printf_buffer();
-    while(!rb_is_empty(printf_buffer)) {
-        while (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET); 
-        USART_SendData(USART2, (uint16_t)(rb_get(printf_buffer)));
-    }
-    USART1->CR1 &= ~USART_CR1_TXEIE;
-    GPIO_ToggleBits(GPIOB, GPIO_Pin_7); 
-}  
+static volatile uint32_t sys_tick = 0;
 
 void SysTick_Handler(void)
 {
-    static uint32_t cnt = 0;
-    if (cnt == 500) {
-        GPIO_ToggleBits(GPIOB, GPIO_Pin_0);
-        cnt = 0;
-    }
-    sysTick++;
-    cnt++;
-}   
+  sys_tick++;
+}
 
 uint32_t getSysTick() {
-    return sysTick;
+  return sys_tick;
 }
+
+#define MAX_DELAY 0xFFFFFFFFU
+
+void delay(uint32_t delay) {
+    uint32_t tickStart = getSysTick();
+    uint32_t wait  = delay;
+    if (wait < MAX_DELAY) {
+        wait++;
+    }
+    while((getSysTick() - tickStart) < wait) {}
+}
+
+void USART2_IRQHandler(void)
+{
+
+}
+
+void ETH_IRQHandler(void)
+{
+  HAL_ETH_IRQHandler(getEthStruct());
+}
+

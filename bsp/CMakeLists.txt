@@ -4,7 +4,7 @@ set(LWIP_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/lwip/src/core)
 
 add_library(bsp STATIC    
     bsp.c
-    ring_buffer.c
+    ringbuffer.c
     stm32f4xx_it.c
     lwip/lwip.c
     lwip/ethernetif.c
@@ -28,7 +28,7 @@ add_library(bsp STATIC
     ${LWIP_SOURCE_DIR}/netif/ethernet.c
 )
 
-target_include_directories(bsp PRIVATE 
+target_include_directories(bsp PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/bsp/lwip
     ${CMAKE_SOURCE_DIR}/bsp/lwip/system

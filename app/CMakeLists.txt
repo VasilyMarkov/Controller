@@ -1,7 +1,6 @@
 set(elf_file stm32.elf)
 
 add_executable(${elf_file}    
-    app.c 
     main.c
     syscalls.c
 )

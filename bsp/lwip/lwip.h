@@ -1,8 +1,11 @@
-#ifndef LWIP_H
-#define LWIP_H
+#ifndef __mx_lwip_H
+#define __mx_lwip_H
 
-void init_LWIP();
-void process_LWIP();
+#include "ethernetif.h"
 
-#endif /* LWIP_H */
+void udpServer_init(void);
+void udp_send_data(const char *data, u16_t len);
+void MX_LWIP_Init(void);
+void MX_LWIP_Process(void);
 
+#endif /*__ mx_lwip_H */

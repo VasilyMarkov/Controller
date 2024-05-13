@@ -98,7 +98,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal_eth.h"
-#include "bsp.h"
+#include "stm32f4xx_it.h"
 /** @addtogroup STM32F4xx_HAL_Driver
   * @{
   */

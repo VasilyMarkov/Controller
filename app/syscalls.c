@@ -3,24 +3,42 @@
 **
 **  File        : syscalls.c
 **
-**  Abstract    : Atollic TrueSTUDIO Minimal System calls file
+**  Abstract    : System Workbench Minimal System calls file
 **
 ** 		          For more information about which c-functions
 **                need which of these lowlevel functions
 **                please consult the Newlib libc-manual
 **
-**  Environment : Atollic TrueSTUDIO
+**  Environment : System Workbench for MCU
 **
-**  Distribution: The file is distributed �as is,� without any warranty
+**  Distribution: The file is distributed as is without any warranty
 **                of any kind.
 **
-**  (c)Copyright Atollic AB.
-**  You may use this file as-is or modify it according to the needs of your
-**  project. Distribution of this file (unmodified or modified) is not
-**  permitted. Atollic AB permit registered Atollic TrueSTUDIO(R) users the
-**  rights to distribute the assembled, compiled & linked contents of this
-**  file as part of an application binary file, provided that it is built
-**  using the Atollic TrueSTUDIO(R) Pro toolchain.
+*****************************************************************************
+**
+** <h2><center>&copy; COPYRIGHT(c) 2014 Ac6</center></h2>
+**
+** Redistribution and use in source and binary forms, with or without modification,
+** are permitted provided that the following conditions are met:
+**   1. Redistributions of source code must retain the above copyright notice,
+**      this list of conditions and the following disclaimer.
+**   2. Redistributions in binary form must reproduce the above copyright notice,
+**      this list of conditions and the following disclaimer in the documentation
+**      and/or other materials provided with the distribution.
+**   3. Neither the name of Ac6 nor the names of its contributors
+**      may be used to endorse or promote products derived from this software
+**      without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+** FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+** DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+** SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+** CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+** OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **
 *****************************************************************************
 */
@@ -37,7 +55,7 @@
 #include "../bsp/bsp.h"
 
 /* Variables */
-#undef errno
+//#undef errno
 extern int errno;
 extern int __io_putchar(int ch) __attribute__((weak));
 extern int __io_getchar(void) __attribute__((weak));
@@ -58,9 +76,9 @@ int _getpid(void)
 	return 1;
 }
 
-int _kill(__attribute__((unused)) int pid, __attribute__((unused)) int sig)
+int _kill(int pid, int sig)
 {
-	// errno = EINVAL;
+	errno = EINVAL;
 	return -1;
 }
 
@@ -70,31 +88,26 @@ void _exit (int status)
 	while (1) {}		/* Make sure we hang here */
 }
 
-int _read (__attribute__((unused)) int file, char *ptr, int len)
+int _read (int file, char *ptr, int len)
 {
 	int DataIdx;
 
 	for (DataIdx = 0; DataIdx < len; DataIdx++)
 	{
-	  *ptr++ = __io_getchar();
+		*ptr++ = __io_getchar();
 	}
 
-	return len;
+return len;
 }
 
-int _write(__attribute__((unused)) int file, char *ptr, int len)
+int _write(int file, char *ptr, int len)
 {
     int i= 0;
     while(i < len) {
         while (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET); 
         USART_SendData(USART2, *ptr++);
-		// ringbuf_uint8t* printf_buffer =  get_printf_buffer();
-		// if (!rb_is_full(printf_buffer)) {
-		// 	rb_put(printf_buffer, *ptr++);
-		// }
 		i++;
     }
-	// USART2->CR1 |= USART_CR1_TXEIE;
     return len;
 }
 
@@ -112,7 +125,7 @@ caddr_t _sbrk(int incr)
 	{
 //		write(1, "Heap and stack collision\n", 25);
 //		abort();
-		// errno = ENOMEM;
+		errno = ENOMEM;
 		return (caddr_t) -1;
 	}
 
@@ -121,71 +134,71 @@ caddr_t _sbrk(int incr)
 	return (caddr_t) prev_heap_end;
 }
 
-int _close(__attribute__((unused)) int file)
+int _close(int file)
 {
 	return -1;
 }
 
 
-int _fstat(__attribute__((unused)) int file, struct stat *st)
+int _fstat(int file, struct stat *st)
 {
 	st->st_mode = S_IFCHR;
 	return 0;
 }
 
-int _isatty(__attribute__((unused)) int file)
+int _isatty(int file)
 {
 	return 1;
 }
 
-int _lseek(__attribute__((unused)) int file, __attribute__((unused)) int ptr, __attribute__((unused)) int dir)
+int _lseek(int file, int ptr, int dir)
 {
 	return 0;
 }
 
-int _open(__attribute__((unused)) char *path, __attribute__((unused)) int flags, ...)
+int _open(char *path, int flags, ...)
 {
 	/* Pretend like we always fail */
 	return -1;
 }
 
-int _wait(__attribute__((unused)) int *status)
+int _wait(int *status)
 {
-	// errno = ECHILD;
+	errno = ECHILD;
 	return -1;
 }
 
-int _unlink(__attribute__((unused)) char *name)
+int _unlink(char *name)
 {
-	// errno = ENOENT;
+	errno = ENOENT;
 	return -1;
 }
 
-int _times(__attribute__((unused)) struct tms *buf)
+int _times(struct tms *buf)
 {
 	return -1;
 }
 
-int _stat(__attribute__((unused)) char *file, struct stat *st)
+int _stat(char *file, struct stat *st)
 {
 	st->st_mode = S_IFCHR;
 	return 0;
 }
 
-int _link(__attribute__((unused)) char *old, __attribute__((unused)) char *new)
+int _link(char *old, char *new)
 {
-	// errno = EMLINK;
+	errno = EMLINK;
 	return -1;
 }
 
 int _fork(void)
 {
-	// errno = EAGAIN;
+	errno = EAGAIN;
 	return -1;
 }
 
-int _execve(__attribute__((unused)) char *name, __attribute__((unused)) char **argv, __attribute__((unused)) char **env)
+int _execve(char *name, char **argv, char **env)
 {
-	// errno = ENOMEM;
+	errno = ENOMEM;
 	return -1;
 }

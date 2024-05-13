@@ -59,7 +59,6 @@
 #include "lwip/mld6.h"
 #include "lwip/sys.h"
 #include "lwip/pbuf.h"
-#include "ethernetif.h"
 
 #if LWIP_DEBUG_TIMERNAMES
 #define HANDLER(x) x, #x
@@ -207,6 +206,7 @@ sys_timeout(u32_t msecs, sys_timeout_handler handler, void *arg)
 {
   struct sys_timeo *timeout, *t;
   u32_t now, diff;
+
   timeout = (struct sys_timeo *)memp_malloc(MEMP_SYS_TIMEOUT);
   if (timeout == NULL) {
     LWIP_ASSERT("sys_timeout: timeout != NULL, pool MEMP_SYS_TIMEOUT is empty", timeout != NULL);
@@ -328,6 +328,7 @@ sys_check_timeouts(void)
       had_one = 0;
       tmptimeout = next_timeout;
       if (tmptimeout && (tmptimeout->time <= diff)) {
+
         /* timeout has expired */
         had_one = 1;
         timeouts_last_time += tmptimeout->time;

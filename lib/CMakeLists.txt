@@ -52,7 +52,7 @@ target_include_directories(stm32f4xx PUBLIC
 target_compile_definitions(stm32f4xx PUBLIC USE_STDPERIPH_DRIVER)
 target_compile_definitions(stm32f4xx PUBLIC ${DEVICE_FAMILY})
 target_compile_definitions(stm32f4xx PUBLIC HSE_VALUE=8000000)
-target_compile_definitions(stm32f4xx PUBLIC SYSTEM_CORE_CLOCK=160000000)
+target_compile_definitions(stm32f4xx PUBLIC SYSTEM_CORE_CLOCK=180000000)
 target_compile_definitions(stm32f4xx PUBLIC USE_STM324x7I_EVAL)
 
 target_compile_options(stm32f4xx PRIVATE -nostartfiles)

@@ -1,7 +1,16 @@
 #include "misc.h"
 #include "bsp.h"
 
+
 #define MAX_DELAY 0xFFFFFFFU
+#define PRINTF_BUFFER_SIZE 128
+
+static uint8_t printf_buffer[PRINTF_BUFFER_SIZE];
+static ringbuf_uint8t ring_buffer;
+
+ringbuf_uint8t* get_printf_buffer() {
+    return &ring_buffer;
+}
 
 static lwip_status_t lwip_status = {.link_status = LINK_DOWN};
 
@@ -59,7 +68,11 @@ void usart_init() {
     usart.USART_BaudRate = 115200;
     usart.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
     USART_Init(USART2, &usart);
-    USART_Cmd(USART2, ENABLE);    
+    
+    // USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
+    // NVIC_SetPriority(USART2_IRQn, 0);
+    // NVIC_EnableIRQ(USART2_IRQn);
+    USART_Cmd(USART2, ENABLE);   
 }
 
 void tim_init() {
@@ -86,21 +99,7 @@ void tim_init() {
 }
 
 void dma_init() {
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
-    DMA_InitTypeDef dma;
-    dma.DMA_Channel = DMA_Channel_0;
-    dma.DMA_DIR = DMA_DIR_MemoryToMemory;
-    dma.DMA_PeripheralInc = DMA_PeripheralInc_Enable;
-    dma.DMA_MemoryInc = DMA_MemoryInc_Enable;
-    dma.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-    dma.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
-    dma.DMA_Mode = DMA_Mode_Normal;
-    dma.DMA_Priority = DMA_Priority_Low;
-    dma.DMA_FIFOMode = DMA_FIFOMode_Enable;
-    dma.DMA_FIFOThreshold = DMA_FIFOThreshold_Full;
-    dma.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
-    dma.DMA_MemoryBurst = DMA_MemoryBurst_Single;
-    DMA_Init(DMA2_Stream0, &dma);
+
 }
 
 void eth_init() {
@@ -144,16 +143,20 @@ void eth_init() {
 
 void board_init() {
     uint32_t tick = SystemCoreClock/1000 - 1;
-    __enable_irq();
+    FLASH_PrefetchBufferCmd(ENABLE);
     SysTick_Config(tick);
     NVIC_EnableIRQ(SysTick_IRQn);
-    gpio_init();
+    gpio_init();    
     usart_init();
+    
     // dma_init();
     eth_init();
     init_LWIP();
     tim_init();
+    rb_init(&ring_buffer, printf_buffer, PRINTF_BUFFER_SIZE);
+    printf("SysClk: %d\r\n", SystemCoreClock);
     printf("Controller is started...\r\n");
+
 }
 
 

@@ -181,7 +181,7 @@ HAL_StatusTypeDef HAL_ETH_Init(ETH_HandleTypeDef *heth)
   uint32_t hclk = 60000000U;
   uint32_t tickstart = 0U;
   uint32_t err = ETH_SUCCESS;
-  
+  printf("Ethernet init\r\n");
   /* Check the ETH peripheral state */
   if(heth == NULL)
   {
@@ -203,9 +203,8 @@ HAL_StatusTypeDef HAL_ETH_Init(ETH_HandleTypeDef *heth)
   }
   
   /* Enable SYSCFG Clock */
-  __HAL_RCC_SYSCFG_CLK_ENABLE();
-  RCC_APB2ENR_SYSCFGEN
-  
+  //__HAL_RCC_SYSCFG_CLK_ENABLE();
+  RCC_APB2PeriphClockCmd(RCC_APB2ENR_SYSCFGEN, ENABLE);
   /* Select MII or RMII Mode*/
   SYSCFG->PMC &= ~(SYSCFG_PMC_MII_RMII_SEL);
   SYSCFG->PMC |= (uint32_t)heth->Init.MediaInterface;
@@ -242,7 +241,7 @@ HAL_StatusTypeDef HAL_ETH_Init(ETH_HandleTypeDef *heth)
   tmpreg1 &= ETH_MACMIIAR_CR_MASK;
   
   /* Get hclk frequency value */
-  hclk = SystemCoreClock;
+  hclk = SystemCoreClock; 
   
   /* Set CR bits depending on hclk value */
   if((hclk >= 20000000U)&&(hclk < 35000000U))
@@ -309,7 +308,7 @@ HAL_StatusTypeDef HAL_ETH_Init(ETH_HandleTypeDef *heth)
       {
         /* In case of write timeout */
         err = ETH_ERROR;
-      
+        printf("mac timeout\r\n");
         /* Config MAC and DMA */
         ETH_MACDMAConfig(heth, err);
         
@@ -1603,7 +1602,6 @@ static void ETH_MACDMAConfig(ETH_HandleTypeDef *heth, uint32_t err)
   ETH_MACInitTypeDef macinit;
   ETH_DMAInitTypeDef dmainit;
   uint32_t tmpreg1 = 0U;
-  
   if (err != ETH_SUCCESS) /* Auto-negotiation failed */
   {
     /* Set Ethernet duplex mode to Full-duplex */

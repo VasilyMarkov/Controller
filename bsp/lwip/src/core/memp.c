@@ -416,7 +416,6 @@ do_memp_free_pool(const struct memp_desc* desc, void *mem)
   memp = (struct memp *)(void *)((u8_t*)mem - MEMP_SIZE);
 
   SYS_ARCH_PROTECT(old_level);
-
 #if MEMP_OVERFLOW_CHECK == 1
   memp_overflow_check_element_overflow(memp, desc);
   memp_overflow_check_element_underflow(memp, desc);
@@ -485,9 +484,7 @@ memp_free(memp_t type, void *mem)
 #ifdef LWIP_HOOK_MEMP_AVAILABLE
   old_first = *memp_pools[type]->tab;
 #endif
-
   do_memp_free_pool(memp_pools[type], mem);
-
 #ifdef LWIP_HOOK_MEMP_AVAILABLE
   if (old_first == NULL) {
     LWIP_HOOK_MEMP_AVAILABLE(type);

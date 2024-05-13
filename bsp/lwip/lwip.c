@@ -5,8 +5,8 @@
 #include "lwip/mem.h"
 #include "lwip/memp.h"
 #include "lwip/udp.h"
-#include "netif/etharp.h"
 #include "lwip/timeouts.h"
+#include "netif/etharp.h"
 #include "ethernetif.h"
 
 void Error_Handler(void);
@@ -65,6 +65,6 @@ void init_LWIP(void)
 void process_LWIP()
 {
   ethernetif_input(&gnetif);
-  // sys_check_timeouts();
+  sys_check_timeouts();
 }
 

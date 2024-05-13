@@ -132,7 +132,7 @@ static void low_level_init(struct netif *netif)
   printf("LAN8742A interface is RMII\r\r\n");
 
   hal_eth_init_status = HAL_ETH_Init(&heth);
-  printf("Status: %d\r\n", hal_eth_init_status);
+
   if (hal_eth_init_status == HAL_OK)
   {
     /* Set netif link flag */  
@@ -182,7 +182,6 @@ static void low_level_init(struct netif *netif)
   
   /* Read Register Configuration */
   HAL_ETH_ReadPHYRegister(&heth, PHY_ISFR , &regvalue);
-  printf("Link: %d\r\n", regvalue);
 
 #endif 
 
@@ -389,25 +388,26 @@ void check_link_status(struct netif* netif) {
  */
 void ethernetif_input(struct netif *netif)
 {
-  // err_t err;
-  // struct pbuf *p;
-  // uint32_t regvalue = 0;
-  // /* move received packet into a new pbuf */
-  // p = low_level_input(netif);
-  netif_set_link_callback(netif, ethernetif_update_config);
+  err_t err;
+  struct pbuf *p;
+  uint32_t regvalue = 0;
+  /* move received packet into a new pbuf */
+  p = low_level_input(netif);
+  // if (p == NULL) printf("Null\r\n");
+  // netif_set_link_callback(netif, ethernetif_update_config);
   check_link_status(netif);
-  // /* no packet could be read, silently ignore this */
-  // if (p == NULL) return;
+  /* no packet could be read, silently ignore this */
+  if (p == NULL) return;
     
-  // // /* entry point to the LwIP stack */
-  // err = netif->input(p, netif);
+  /* entry point to the LwIP stack */
+  err = netif->input(p, netif);
   
-  // if (err != ERR_OK)
-  // {
-  //   LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
-  //   pbuf_free(p);
-  //   p = NULL;    
-  // }
+  if (err != ERR_OK)
+  {
+    LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
+    pbuf_free(p);
+    p = NULL;    
+  }
 }
 
 #if !LWIP_ARP

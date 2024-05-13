@@ -207,7 +207,6 @@ sys_timeout(u32_t msecs, sys_timeout_handler handler, void *arg)
 {
   struct sys_timeo *timeout, *t;
   u32_t now, diff;
-
   timeout = (struct sys_timeo *)memp_malloc(MEMP_SYS_TIMEOUT);
   if (timeout == NULL) {
     LWIP_ASSERT("sys_timeout: timeout != NULL, pool MEMP_SYS_TIMEOUT is empty", timeout != NULL);

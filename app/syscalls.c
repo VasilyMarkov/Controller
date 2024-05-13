@@ -88,9 +88,13 @@ int _write(__attribute__((unused)) int file, char *ptr, int len)
     while(i < len) {
         while (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET); 
         USART_SendData(USART2, *ptr++);
-        i++;
+		// ringbuf_uint8t* printf_buffer =  get_printf_buffer();
+		// if (!rb_is_full(printf_buffer)) {
+		// 	rb_put(printf_buffer, *ptr++);
+		// }
+		i++;
     }
-    
+	// USART2->CR1 |= USART_CR1_TXEIE;
     return len;
 }
 

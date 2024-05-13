@@ -4,10 +4,11 @@ set(LWIP_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/lwip/src/core)
 
 add_library(bsp STATIC    
     bsp.c
+    ring_buffer.c
     stm32f4xx_it.c
     lwip/lwip.c
     lwip/ethernetif.c
-    lwip/stm32f4_eth_periph/src/stm32f4xx_hal_eth.c
+    lwip/stm32f4xx_hal_eth.c
     ${LWIP_SOURCE_DIR}/api/err.c
     ${LWIP_SOURCE_DIR}/core/def.c
     ${LWIP_SOURCE_DIR}/core/init.c
@@ -34,7 +35,6 @@ target_include_directories(bsp PRIVATE
     ${LWIP_INCLUDES}
     ${LWIP_INCLUDES}/lwip
     ${LWIP_INCLUDES}/netif
-    ${LWIP_INCLUDES}/stm32f4_eth_periph/inc
 )
 
 target_link_libraries(bsp PUBLIC 

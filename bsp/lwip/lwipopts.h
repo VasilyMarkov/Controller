@@ -88,7 +88,7 @@
 /*----- Value in opt.h for LWIP_ETHERNET: LWIP_ARP || PPPOE_SUPPORT -*/
 #define LWIP_ETHERNET 1
 /*----- Default Value for LWIP_DHCP_CHECK_LINK_UP: 0 ---*/
-#define LWIP_DHCP_CHECK_LINK_UP 1
+#define LWIP_DHCP_CHECK_LINK_UP 0
 /*----- Value in opt.h for LWIP_DNS_SECURE: (LWIP_DNS_SECURE_RAND_XID | LWIP_DNS_SECURE_NO_MULTIPLE_OUTSTANDING | LWIP_DNS_SECURE_RAND_SRC_PORT) -*/
 #define LWIP_DNS_SECURE 7
 /*----- Value in opt.h for TCP_SND_QUEUELEN: (4*TCP_SND_BUF + (TCP_MSS - 1))/TCP_MSS -----*/
@@ -150,6 +150,10 @@
 #define LWIP_TCP 0
 
 #define LWIP_NETIF_LINK_CALLBACK 1
+
+#define PBUF_POOL_SIZE 8
+
+#define PBUF_POOL_BUFSIZE 512
 /* USER CODE END 1 */
 
 #ifdef __cplusplus

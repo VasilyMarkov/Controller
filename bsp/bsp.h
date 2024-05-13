@@ -7,7 +7,9 @@
 #include "stm32f4xx_rcc.h"
 #include "stm32f4xx_dma.h"
 #include "stm32f4xx_tim.h"
+#include "stm32f4xx_flash.h"
 #include "lwip/lwip.h"
+#include "ring_buffer.h"
 
 typedef enum  {
   LINK_DOWN,
@@ -23,4 +25,5 @@ uint32_t getRegister();
 uint32_t getSysTick();
 void delay(uint32_t);
 lwip_status_t* get_lwip_status();
+ringbuf_uint8t* get_printf_buffer();
 #endif

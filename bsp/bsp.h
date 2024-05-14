@@ -10,6 +10,16 @@
 #include "stm32f4xx_flash.h"
 #include "lwip/lwip.h"
 
-void board_init();
+typedef enum  {
+  LINK_DOWN,
+  LINK_UP 
+} status_t;
+
+typedef struct {
+  uint8_t link_status;
+} lwip_status_t;
+
+void boardInit();
+lwip_status_t* getLwipStatus();
 
 #endif

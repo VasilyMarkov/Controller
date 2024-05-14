@@ -57,21 +57,11 @@
 #include "lwip/ethip6.h"
 #include "ethernetif.h"
 #include <string.h>
-
-/* Within 'USER CODE' section, code will be kept by default at each generation */
-/* USER CODE BEGIN 0 */
 #include <stdio.h>
-/* USER CODE END 0 */
-
-/* Private define ------------------------------------------------------------*/
 
 /* Network interface name */
 #define IFNAME0 's'
 #define IFNAME1 't'
-
-/* USER CODE BEGIN 1 */
-
-/* USER CODE END 1 */
 
 /* Private variables ---------------------------------------------------------*/
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
@@ -94,31 +84,12 @@ __ALIGN_BEGIN uint8_t Rx_Buff[ETH_RXBUFNB][ETH_RX_BUF_SIZE] __ALIGN_END; /* Ethe
 #endif
 __ALIGN_BEGIN uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE] __ALIGN_END; /* Ethernet Transmit Buffer */
 
-/* USER CODE BEGIN 2 */
-
-/* USER CODE END 2 */
-
 /* Global Ethernet handle */
 ETH_HandleTypeDef heth;
 
 ETH_HandleTypeDef* getEthStruct() {
   return &heth;
 }
-
-/* USER CODE BEGIN 3 */
-
-/* USER CODE END 3 */
-
-/* Private functions ---------------------------------------------------------*/
-
-// void HAL_ETH_MspInit(ETH_HandleTypeDef* ethHandle)
-// {
-
-// }
-
-/* USER CODE BEGIN 4 */
-
-/* USER CODE END 4 */
 
 /*******************************************************************************
                        LL Driver Interface ( LwIP stack --> ETH) 
@@ -135,8 +106,6 @@ static void low_level_init(struct netif *netif)
   uint32_t regvalue = 0;
   HAL_StatusTypeDef hal_eth_init_status;
   
-/* Init ETH */
-
    uint8_t MACAddr[6] ;
   heth.Instance = ETH;
   heth.Init.AutoNegotiation = ETH_AUTONEGOTIATION_ENABLE;
@@ -152,13 +121,11 @@ static void low_level_init(struct netif *netif)
   heth.Init.ChecksumMode = ETH_CHECKSUM_BY_HARDWARE;
   heth.Init.MediaInterface = ETH_MEDIA_INTERFACE_RMII;
 
-  /* USER CODE BEGIN MACADDRESS */
   printf("LAN8742A PHYAD: 0x0\r\r\n");
   printf("Setting MACaddr: %02x:%02x:%02x:%02x:%02x:%02x\r\r\n",
 		  MACAddr[0], MACAddr[1], MACAddr[2],
 		  MACAddr[3], MACAddr[4], MACAddr[5]);
   printf("LAN8742A interface is RMII\r\r\n");
-  /* USER CODE END MACADDRESS */
 
   hal_eth_init_status = HAL_ETH_Init(&heth);
 
@@ -200,10 +167,7 @@ static void low_level_init(struct netif *netif)
   /* Enable MAC and DMA transmission and reception */
   HAL_ETH_Start(&heth);
 
-/* USER CODE BEGIN PHY_PRE_CONFIG */ 
-   printf("Starting Ethernet IRQ/DMA..\r\r\n");
-/* USER CODE END PHY_PRE_CONFIG */
-  
+  printf("Starting Ethernet IRQ/DMA..\r\r\n");
 
   /* Read Register Configuration */
   HAL_ETH_ReadPHYRegister(&heth, PHY_ISFR, &regvalue);
@@ -214,14 +178,9 @@ static void low_level_init(struct netif *netif)
   
   /* Read Register Configuration */
   HAL_ETH_ReadPHYRegister(&heth, PHY_ISFR , &regvalue);
-/* USER CODE BEGIN PHY_POST_CONFIG */ 
-/* USER CODE END PHY_POST_CONFIG */
 
 #endif /* LWIP_ARP || LWIP_ETHERNET */
 
-/* USER CODE BEGIN LOW_LEVEL_INIT */ 
-    
-/* USER CODE END LOW_LEVEL_INIT */
 }
 
 /**
@@ -336,7 +295,6 @@ static struct pbuf * low_level_input(struct netif *netif)
   uint32_t byteslefttocopy = 0;
   uint32_t i=0;
   
-
   /* get received frame */
   if (HAL_ETH_GetReceivedFrame(&heth) != HAL_OK)
     return NULL;
@@ -404,29 +362,31 @@ static struct pbuf * low_level_input(struct netif *netif)
   return p;
 }
 
-void check_link_status(struct netif *netif) {
+void check_link_status(struct netif* netif) {
   uint32_t regvalue = 0;
   if (HAL_ETH_ReadPHYRegister(&heth, PHY_BSR, &regvalue) == HAL_OK)
   {
-	  if((regvalue & PHY_LINKED_STATUS)== (uint16_t)RESET)
-	  {
-          if (netif_is_link_up(netif))
-          {
-//              netif_set_down(netif);
-              printf("unplugged\r\n");
-//              netif_set_link_down(netif);
-          }
-      } else {
-          // Link status = connected
-          if (!netif_is_link_up(netif))
-          {
-              printf("plugged\r\n");
-//              NVIC_SystemReset();
-          }
-	  }
+    if((regvalue & PHY_LINKED_STATUS)== (uint16_t)RESET) 
+    {
+      // Link status = disconnected
+      if (netif_is_link_up(netif))
+      {
+          netif_set_down(netif);
+          getLwipStatus()->link_status = LINK_DOWN;
+          netif_set_link_down(netif);
+      }
+    } 
+    else {
+      // Link status = connected
+      if (!netif_is_link_up(netif))
+      {
+          getLwipStatus()->link_status = LINK_UP;
+          NVIC_SystemReset();
+      }
+      getLwipStatus()->link_status = LINK_UP;
+    }
   }
 }
-
 /**
  * This function should be called when a packet is ready to be read
  * from the interface. It uses the function low_level_input() that
@@ -440,7 +400,7 @@ void ethernetif_input(struct netif *netif)
 {
   err_t err;
   struct pbuf *p;
-//  HAL_GPIO_TogglePin(GPIOB, 7);
+
   /* move received packet into a new pbuf */
   p = low_level_input(netif);
   check_link_status(netif);
@@ -469,11 +429,7 @@ static err_t low_level_output_arp_off(struct netif *netif, struct pbuf *q, const
 {  
   err_t errval;
   errval = ERR_OK;
-    
-/* USER CODE BEGIN 5 */ 
-    
-/* USER CODE END 5 */  
-    
+     
   return errval;
   
 }
@@ -530,8 +486,6 @@ err_t ethernetif_init(struct netif *netif)
   return ERR_OK;
 }
 
-/* USER CODE BEGIN 6 */
-
 /**
 * @brief  Returns the current time in milliseconds
 *         when LWIP_TIMERS == 1 and NO_SYS == 1
@@ -553,12 +507,6 @@ u32_t sys_now(void)
 {
   return getSysTick();
 }
-
-/* USER CODE END 6 */
-
-/* USER CODE BEGIN 7 */
-
-/* USER CODE END 7 */
 
 #if LWIP_NETIF_LINK_CALLBACK
 /**
@@ -649,7 +597,6 @@ void ethernetif_update_config(struct netif *netif)
   ethernetif_notify_conn_changed(netif);
 }
 
-/* USER CODE BEGIN 8 */
 /**
   * @brief  This function notify user about link status changement.
   * @param  netif: the network interface
@@ -662,11 +609,8 @@ __weak void ethernetif_notify_conn_changed(struct netif *netif)
   */
 
 }
-/* USER CODE END 8 */ 
+
 #endif /* LWIP_NETIF_LINK_CALLBACK */
 
-/* USER CODE BEGIN 9 */
 
-/* USER CODE END 9 */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

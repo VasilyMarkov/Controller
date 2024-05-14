@@ -1,8 +1,6 @@
 #include "stm32f4xx_it.h"
 #include "lwip/ethernetif.h"
 
-// extern ETH_HandleTypeDef heth;
-
 static volatile uint32_t sys_tick = 0;
 
 void SysTick_Handler(void)
@@ -23,6 +21,18 @@ void delay(uint32_t delay) {
         wait++;
     }
     while((getSysTick() - tickStart) < wait) {}
+}
+
+void TIM7_IRQHandler()
+{
+    TIM_ClearITPendingBit(TIM7, TIM_IT_Update); 
+
+    if(getLwipStatus()->link_status == LINK_UP) {
+        GPIO_ToggleBits(GPIOB, GPIO_Pin_7); 
+    }
+    else {
+        GPIO_ResetBits(GPIOB, GPIO_Pin_7);
+    }
 }
 
 void USART2_IRQHandler(void)

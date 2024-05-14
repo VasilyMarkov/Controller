@@ -5,7 +5,7 @@
 
 void udpServer_init(void);
 void udp_send_data(const char *data, u16_t len);
-void MX_LWIP_Init(void);
-void MX_LWIP_Process(void);
+void lwipInit(void);
+void lwipProcess(void);
 
-#endif /*__ mx_lwip_H */
+#endif 

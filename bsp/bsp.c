@@ -60,9 +60,6 @@ void uartInit(void)
   GPIO_PinAFConfig(GPIOD, GPIO_PinSource5, GPIO_AF_USART2);
   GPIO_PinAFConfig(GPIOD, GPIO_PinSource6, GPIO_AF_USART2);
 
-  // NVIC_SetPriority(USART2_IRQn, 0);
-  // NVIC_EnableIRQ(USART2_IRQn);
-
   USART_InitTypeDef usart;
   usart.USART_BaudRate = 115200;
   usart.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
@@ -139,6 +136,6 @@ void boardInit() {
     uartInit();
     ethInit();
     tim_init();
-    printf("Starting main loop..\r\n");
     lwipInit();
+    printf("Starting app..\r\n");
 }

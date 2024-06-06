@@ -388,7 +388,7 @@ udp_input(struct pbuf *p, struct netif *inp)
       }
 #endif /* SO_REUSE && SO_REUSE_RXTOALL */
       /* callback */
-      if (pcb->recv != NULL) {
+    if (pcb->recv != NULL) {
         /* now the recv function is responsible for freeing p */
         pcb->recv(pcb->recv_arg, pcb, p, ip_current_src_addr(), src);
       } else {
@@ -396,7 +396,8 @@ udp_input(struct pbuf *p, struct netif *inp)
         pbuf_free(p);
         goto end;
       }
-    } else {
+    } 
+    else {
       LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE, ("udp_input: not for us.\n"));
 
 #if LWIP_ICMP || LWIP_ICMP6

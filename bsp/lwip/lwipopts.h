@@ -147,8 +147,11 @@
 #define LWIP_DEBUG 1
 
 #define LWIP_TCP 0
-
+#define LWIP_UDP 1
+#define MEMP_NUM_UDP_PCB 6 
 #define LWIP_NETIF_LINK_CALLBACK 1
+#define PBUF_POOL_SIZE 16
+#define PBUF_POOL_BUFSIZE 1200
 /* USER CODE END 1 */
 
 #ifdef __cplusplus

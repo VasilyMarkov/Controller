@@ -8,11 +8,13 @@
 #include "lwip/timeouts.h"
 #include "netif/etharp.h"
 
+#define UDP_RX_BUFFER_SIZE 128
+
 void Error_Handler(void);
 
 struct udp_pcb *upcb;
 ip_addr_t remote_ip;
-u16_t remote_port;
+const uint16_t remote_port = 5678;
 
 struct netif gnetif;
 ip4_addr_t ipaddr;
@@ -22,32 +24,45 @@ uint8_t IP_ADDRESS[4];
 uint8_t NETMASK_ADDRESS[4];
 uint8_t GATEWAY_ADDRESS[4];
 
+static char udp_receive_buffer[UDP_RX_BUFFER_SIZE];
+
+void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const ip_addr_t *addr, u16_t port);
+
+void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const ip_addr_t *addr, u16_t port) {
+  strncpy(udp_receive_buffer,p->payload,p->len);
+  udp_receive_buffer[p->len]=0;
+  // printf("Test\r\n");
+  printf("%s\r\n", udp_receive_buffer);
+  pbuf_free(p);
+  GPIO_ToggleBits(GPIOD, GPIO_Pin_0);
+}
+
 void udpServer_init(void)
 {
-	// UDP Control Block structure
-   err_t err;
+  ip_addr_t local_ip;
+  uint16_t local_port = 1234;
+  uint16_t remote_port = 5678;
+  err_t err;
 
-   /* 1. Create a new UDP control block  */
-   upcb = udp_new();
-   ip_addr_t local_ip;
-   u16_t local_port;
-   local_port = 1234;
-   /* 2. Bind the upcb to the local port */
-   IP_ADDR4(&local_ip, 192, 168, 1, 66);
+  upcb = udp_new();
 
-   err = udp_bind(upcb, &local_ip, local_port);  
-
-   /* 3. Set a receive callback for the upcb */
-   if(err == ERR_OK)
-   {
-	  IP4_ADDR(&remote_ip, 192, 168, 1, 111);
-	  remote_port = 5678;
-
-   }
-   else
-   {
-	   udp_remove(upcb);
-   }
+  if(upcb != NULL) {
+    IP_ADDR4(&local_ip, 192, 168, 1, 66);
+    err = udp_bind(upcb, &local_ip, local_port);  
+    if (err == ERR_OK) {
+      // printf("UDP bind\r\n");
+    }
+    // IP4_ADDR(&remote_ip, 192, 168, 1, 111);
+    // err= udp_connect(upcb, &remote_ip, remote_port);
+    if (err == ERR_OK) {
+      // printf("UDP connect\r\n");
+      udp_recv(upcb, udp_receive_callback, NULL);
+    }
+  }
+  else
+  {
+    udp_remove(upcb);
+  }
 }
 
 void udp_send_data(const char *data, u16_t len)
@@ -67,6 +82,8 @@ void udp_send_data(const char *data, u16_t len)
     }
   }
 }
+
+
 
 void lwipInit(void)
 {

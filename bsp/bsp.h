@@ -8,6 +8,7 @@
 #include "stm32f4xx_dma.h"
 #include "stm32f4xx_tim.h"
 #include "stm32f4xx_flash.h"
+#include "stm32f4xx_hal_eth.h"
 #include "lwip/lwip.h"
 
 typedef enum  {

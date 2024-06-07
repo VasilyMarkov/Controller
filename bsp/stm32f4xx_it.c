@@ -26,7 +26,7 @@ void delay(uint32_t delay) {
 void TIM7_IRQHandler()
 {
     TIM_ClearITPendingBit(TIM7, TIM_IT_Update); 
-
+    // GPIO_ToggleBits(GPIOB, GPIO_Pin_7); 
     if(getLwipStatus()->link_status == LINK_UP) {
         GPIO_ToggleBits(GPIOB, GPIO_Pin_7); 
     }

@@ -42,12 +42,13 @@ int main(void)
   
   while (1)
   {
-    lwipProcess(); 
+    // lwipProcess(); 
     const char *data = "Hello, world!";
     sprintf(numStr, "%d", cnt++);
     char* strCat = strcat(data, numStr);
     // udp_send_data(numStr, strlen(numStr));
     // serialzie();
+    // printf("Test\r\n");
     GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
     delay(100);
   }

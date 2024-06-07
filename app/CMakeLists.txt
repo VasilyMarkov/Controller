@@ -1,14 +1,5 @@
 set(elf_file stm32.elf)
 
-# include(FetchContent)
-
-# FetchContent_Declare(nanopb
-#     GIT_REPOSITORY https://github.com/nanopb/nanopb
-#     GIT_TAG        master
-# )
-
-# FetchContent_MakeAvailable(nanopb)
-
 # set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/nanopb/extra)
 # find_package(Nanopb REQUIRED)
 

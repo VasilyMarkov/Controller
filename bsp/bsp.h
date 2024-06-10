@@ -22,5 +22,5 @@ typedef struct {
 
 void boardInit();
 lwip_status_t* getLwipStatus();
-
+void send_uart(const uint8_t*, uint8_t);
 #endif

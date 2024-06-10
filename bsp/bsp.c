@@ -3,10 +3,25 @@
 
 #define kHz_1 1000
 
+static USART_TypeDef* dbg_uart = NULL;
+
 static lwip_status_t lwip_status = {.link_status = LINK_DOWN};
 
 lwip_status_t* getLwipStatus() {
     return &lwip_status;
+}
+
+void register_dbg_uart(USART_TypeDef* uart) {
+    dbg_uart = uart;
+}
+
+void send_uart(const uint8_t* data, uint8_t len) {
+    uint8_t i = 0;
+    while(i < len) {
+        while (USART_GetFlagStatus(dbg_uart, USART_FLAG_TXE) == RESET); 
+        USART_SendData(dbg_uart, *data++);
+		i++;
+    }
 }
 
 void sysInit() { 
@@ -134,6 +149,7 @@ void boardInit() {
     sysInit();
     gpioInit();
     uartInit();
+    register_dbg_uart(USART2);
     ethInit();
     tim_init();
     lwipInit();

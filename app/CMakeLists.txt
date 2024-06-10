@@ -5,7 +5,8 @@ find_package(Nanopb REQUIRED)
 
 nanopb_generate_cpp(TARGET proto simple.proto)
 
-add_executable(${elf_file}    
+add_executable(${elf_file}
+    app.c    
     main.c
     syscalls.c
 )

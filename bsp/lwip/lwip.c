@@ -83,8 +83,6 @@ void udp_send_data(const char *data, u16_t len)
   }
 }
 
-
-
 void lwipInit(void)
 {
 	  IP_ADDRESS[0] = 192;

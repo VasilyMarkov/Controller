@@ -7,6 +7,10 @@ static USART_TypeDef* dbg_uart = NULL;
 
 static lwip_status_t lwip_status = {.link_status = LINK_DOWN};
 
+USART_TypeDef* get_dbg_uart() {
+    return &dbg_uart;
+}
+
 lwip_status_t* getLwipStatus() {
     return &lwip_status;
 }

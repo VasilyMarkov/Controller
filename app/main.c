@@ -1,8 +1,6 @@
 #include "../bsp/bsp.h"
 #include "app.h"
 
-
-
 int main(void)
 {
   boardInit();

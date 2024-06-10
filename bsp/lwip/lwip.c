@@ -52,7 +52,7 @@ void udpServer_init(void)
     if (err == ERR_OK) {
       // printf("UDP bind\r\n");
     }
-    // IP4_ADDR(&remote_ip, 192, 168, 1, 111);
+    IP4_ADDR(&remote_ip, 192, 168, 1, 111);
     // err= udp_connect(upcb, &remote_ip, remote_port);
     if (err == ERR_OK) {
       // printf("UDP connect\r\n");

@@ -8,10 +8,3 @@ project(stm32)
 add_subdirectory(app)   #application
 add_subdirectory(bsp)   #board support package, lwip
 add_subdirectory(libs/stm32f4xx)   #stm32f4xx library
-
-
-
-
-
-
-

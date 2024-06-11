@@ -13,15 +13,18 @@
 
 typedef enum  {
   LINK_DOWN,
-  LINK_UP 
+  LINK_UP,
+  PACKET_RDY, 
+  PACKET_NOT_RDY 
 } status_t;
 
 typedef struct {
   uint8_t link_status;
+  uint8_t udp_packet_rdy;
 } lwip_status_t;
 
 void boardInit();
 lwip_status_t* getLwipStatus();
 USART_TypeDef* get_dbg_uart();
-void send_uart(const uint8_t*, uint8_t);
+void uart_send_data(const uint8_t*, uint8_t);
 #endif

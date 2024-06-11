@@ -8,7 +8,6 @@
 #include "lwip/timeouts.h"
 #include "netif/etharp.h"
 
-#define UDP_RX_BUFFER_SIZE 128
 
 void Error_Handler(void);
 
@@ -24,17 +23,22 @@ uint8_t IP_ADDRESS[4];
 uint8_t NETMASK_ADDRESS[4];
 uint8_t GATEWAY_ADDRESS[4];
 
-static char udp_receive_buffer[UDP_RX_BUFFER_SIZE];
+static udp_receive_buffer_t udp_receive_buffer = {.len = 0};
+
+udp_receive_buffer_t* getUdpReceiveBuffer() {
+  return &udp_receive_buffer;
+}
 
 void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const ip_addr_t *addr, u16_t port);
 
 void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const ip_addr_t *addr, u16_t port) {
-  strncpy(udp_receive_buffer,p->payload,p->len);
-  udp_receive_buffer[p->len]=0;
-  // printf("Test\r\n");
-  printf("%s\r\n", udp_receive_buffer);
+  strncpy(udp_receive_buffer.buf,p->payload,p->len);
+  udp_receive_buffer.len = p->len;
+  udp_receive_buffer.buf[p->len]=0;
+  // printf("udp packet\r\n");
+  // printf("%s\r\n", udp_receive_buffer.buf);
+  getLwipStatus()->udp_packet_rdy = PACKET_RDY;
   pbuf_free(p);
-  GPIO_ToggleBits(GPIOD, GPIO_Pin_0);
 }
 
 void udpServer_init(void)
@@ -52,7 +56,7 @@ void udpServer_init(void)
     if (err == ERR_OK) {
       // printf("UDP bind\r\n");
     }
-    IP4_ADDR(&remote_ip, 192, 168, 1, 111);
+    IP4_ADDR(&remote_ip, 192, 168, 1, 110);
     // err= udp_connect(upcb, &remote_ip, remote_port);
     if (err == ERR_OK) {
       // printf("UDP connect\r\n");

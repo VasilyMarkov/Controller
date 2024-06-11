@@ -3,7 +3,10 @@ set(elf_file stm32.elf)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/nanopb/extra)
 find_package(Nanopb REQUIRED)
 
-nanopb_generate_cpp(TARGET proto simple.proto)
+nanopb_generate_cpp(TARGET proto 
+    simple.proto
+    quaternion.proto
+)
 
 add_executable(${elf_file}
     app.c    

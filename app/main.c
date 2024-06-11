@@ -11,9 +11,12 @@ int main(void)
   while (1)
   {
     lwipProcess(); 
-    sendData(udp_send_data);
     GPIO_ToggleBits(GPIOB, GPIO_Pin_14);
-    delay(100);
+    if (getLwipStatus()->udp_packet_rdy == PACKET_RDY) {
+      getLwipStatus()->udp_packet_rdy = PACKET_NOT_RDY;
+      udp_receive_buffer_t* udp_buffer = getUdpReceiveBuffer();
+      deserialize(udp_buffer->buf, udp_buffer->len);
+    }
   }
 
 }

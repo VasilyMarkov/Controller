@@ -1,5 +1,6 @@
 #include "stm32f4xx_it.h"
 #include "lwip/ethernetif.h"
+#include "../app/app.h"
 
 static volatile uint32_t sys_tick = 0;
 
@@ -26,13 +27,13 @@ void delay(uint32_t delay) {
 void TIM7_IRQHandler()
 {
     TIM_ClearITPendingBit(TIM7, TIM_IT_Update); 
-    // GPIO_ToggleBits(GPIOB, GPIO_Pin_7); 
     if(getLwipStatus()->link_status == LINK_UP) {
         GPIO_ToggleBits(GPIOB, GPIO_Pin_7); 
     }
     else {
         GPIO_ResetBits(GPIOB, GPIO_Pin_7);
     }
+    // sendData(udp_send_data);
 }
 
 void USART2_IRQHandler(void)

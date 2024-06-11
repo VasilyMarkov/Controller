@@ -5,7 +5,7 @@
 
 static USART_TypeDef* dbg_uart = NULL;
 
-static lwip_status_t lwip_status = {.link_status = LINK_DOWN};
+static lwip_status_t lwip_status = {.link_status = LINK_DOWN, .udp_packet_rdy = PACKET_NOT_RDY};
 
 USART_TypeDef* get_dbg_uart() {
     return &dbg_uart;
@@ -19,7 +19,9 @@ void register_dbg_uart(USART_TypeDef* uart) {
     dbg_uart = uart;
 }
 
-void send_uart(const uint8_t* data, uint8_t len) {
+void uart_send_data(const uint8_t* data, uint8_t len) {
+    if (get_dbg_uart() == NULL) 
+        return;
     uint8_t i = 0;
     while(i < len) {
         while (USART_GetFlagStatus(dbg_uart, USART_FLAG_TXE) == RESET); 
